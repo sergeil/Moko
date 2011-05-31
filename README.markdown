@@ -3,12 +3,13 @@
 Moko is a lighweight mocking mini-framework that sits on top of PHP5.3+, the main goal
 that this framework is intended to solve it to make mocking objects in PHP really easy. It
 is very easy to get started using its because its API consists only of two methods, namely:
-* __constructor($targetName, $omitConstructor)
-* addMethod($methodName, \Closure $callback)
+ * __constructor($targetName, $omitConstructor)
+ * addMethod($methodName, \Closure $callback)
 
 A typical usage workflow could look like this:
 
 Say, you have an interface "MyInterface":
+
 ```php
 interface MyInterface
 {
