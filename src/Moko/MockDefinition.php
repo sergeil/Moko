@@ -27,22 +27,22 @@ namespace Moko;
 /**
  * @author Sergei Lissovski <sergei.lissovski@gmail.com>
  */ 
-class MockAssembler
+class MockDefinition
 {
     /**
      * @var string
      */
-    private $targetName;
+    protected $targetName;
 
     /**
      * @var array
      */
-    private $definitions = array();
+    protected $definitions = array();
 
     /**
      * @var boolean
      */
-    private $isConstructorOmitted;
+    protected $isConstructorOmitted;
 
     /**
      * @var \ReflectionClass
@@ -78,6 +78,8 @@ class MockAssembler
     }
 
     /**
+     * If targetName interface/class hasn't been loaded yet we will try to load it behind the scene.
+     *
      * @throws \InvalidArgumentException  If a $targetName class/interface doesn't exist
      * @param string $targetName  Name of an interface/class name you want to mock
      * @param boolean $omitConstructor Wether the parent's constructor should be overriden with a non-parameters one
@@ -101,6 +103,7 @@ class MockAssembler
      *                            An instance of mock object will be passed as a first parameter of the closure,
      *                            if a method is static then mock's FQCN will be passed instead.
      * @param bool $isStatic
+     * @return \Moko\MockAssembler
      */
     public function addMethod($methodName, \Closure $callback)
     {
@@ -118,6 +121,8 @@ class MockAssembler
             'isDynamic' => false,
             'callback' => $callback
         );
+
+        return $this;
     }
 
     /**

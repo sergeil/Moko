@@ -6,6 +6,7 @@ namespace <?php echo $namespace ?>;
 class <?php echo $className ?> <?php echo $targetRelationship ?> \<?php echo $targetName; ?>
 {
     static public $____callbacks = array();
+    static public $____invocationCounters = array();
 
     <?php if ($omitConstructor): ?>
     public function __construct()
@@ -17,6 +18,10 @@ class <?php echo $className ?> <?php echo $targetRelationship ?> \<?php echo $ta
     <?php echo $methodDef['docBlock'] ?> 
     <?php echo implode(' ', $methodDef['modifiers']) ?> function <?php echo $methodName ?>(<?php echo implode(',', $methodDef['params'])?>)
     {
+        if (!isset(self::$____invocationCounters['<?php echo $methodName ?>'])) {
+            self::$____invocationCounters['<?php echo $methodName ?>'] = 0;
+        }
+        self::$____invocationCounters['<?php echo $methodName ?>']++;
 
         <?php if (!$methodDef['isExplicetelyDefined'] && !$suppressUnexpectedInteractionExceptions): ?>
         throw new \Moko\UnexpectedInteractionException(

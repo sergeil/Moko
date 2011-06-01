@@ -1,43 +1,46 @@
 <?php
+/*
+ * Copyright (c) 2011 Sergei Lissovski, http://sergei.lissovski.org
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 
 namespace Moko;
 
-require_once implode(DIRECTORY_SEPARATOR, array('..', '..', 'src', 'Moko', 'MockAssembler.php'));
-require_once implode(DIRECTORY_SEPARATOR, array('..', '..', 'src', 'Moko', 'UnexpectedInteractionException.php'));
-require_once implode(DIRECTORY_SEPARATOR, array('PHPUnit', 'Framework', 'TestCase.php'));
+require_once '_mocks.php';
 
-interface _MockInterface
-{
-    public function doFoo($param1);
-
-    /**
-     * bardoc
-     */
-    public function doBar();
-
-    public function doFooBar(\stdClass $param1, array $param2, array $param3 = array('foo', 'bar'), $param4 = null);
-
-    static public function doBlah();
-}
-
-class _MockClass
-{
-
-}
+require_once '../../src/Moko/ClassLoader.php';
+ClassLoader::register();
 
 /**
- * @copyright 2011 Modera Foundation
- * @author Sergei Lissovski <sergei.lissovski@modera.net>
+ * @author Sergei Lissovski <sergei.lissovski@gmail.com>
  */ 
-class MockAssemblerTest extends \PHPUnit_Framework_TestCase
+class MockDefinitionTest extends \PHPUnit_Framework_TestCase
 {
     public function test__construct()
     {
-        $ma1 = new MockAssembler('Moko\_MockInterface', true);
+        $ma1 = new MockDefinition('Moko\_MockInterface', true);
         $this->assertEquals('Moko\_MockInterface', $ma1->getTargetName());
         $this->assertTrue($ma1->isConstructorOmitted());
 
-        $ma2 = new MockAssembler('Moko\_MockClass', false);
+        $ma2 = new MockDefinition('Moko\_MockClass', false);
         $this->assertEquals('Moko\_MockClass', $ma2->getTargetName());
         $this->assertFalse($ma2->isConstructorOmitted());
     }
@@ -47,21 +50,23 @@ class MockAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     public function test__construct_unexistingClass()
     {
-        $ma1 = new MockAssembler('FooClazz');
+        $ma1 = new MockDefinition('FooClazz');
     }
 
     public function testCreateMock_interface()
     {
-        $ma = new MockAssembler('Moko\_MockInterface');
+        $ma = new MockDefinition('Moko\_MockInterface');
         $ma->addMethod('doFoo', function($cx, $param1) {
             $cx->param1Value = $param1; // dynamically creating a new variable
         });
 
         $staticCheck = new \stdClass();
 
-        $ma->addMethod('doBlah', function($fqcn) use ($staticCheck) {
+        $chainedMa = $ma->addMethod('doBlah', function($fqcn) use ($staticCheck) {
             $staticCheck->fqcn = $fqcn;
         });
+
+        $this->assertSame($ma, $chainedMa);
 
         $instance = $ma->createMock();
         $this->assertTrue($instance instanceof _MockInterface);
@@ -99,7 +104,7 @@ class MockAssemblerTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateMock_class()
     {
-        $ma1 = new MockAssembler('Moko\_MockClass', true);
+        $ma1 = new MockDefinition('Moko\_MockClass', true);
         $instance = $ma1->createMock();
         $this->assertTrue($instance instanceof _MockClass);
     }
