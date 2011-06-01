@@ -92,9 +92,9 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 ```
 
 In general Moko is made of three classes with very simple API:
- - MockDefinition  - This class heart of the Moko, it provides the backbone functionality for mocking
- - TestCaseAwareMockDefinition - This class complements MockDefinition class and provides easy way of method invocation count validation
- - MockFactory - An auxiliary class that may be used to create instances of two aforementioned classes, will be useful if you need
+ - MockDefinition: This class heart of the Moko, it provides the backbone functionality for mocking
+ - TestCaseAwareMockDefinition: This class complements MockDefinition class and provides easy way of method invocation count validation
+ - MockFactory: An auxiliary class that may be used to create instances of two aforementioned classes, will be useful if you need
    to deal with several TestCaseAwareMockDefinition in a single TestCase.
 
 # What's next ?
