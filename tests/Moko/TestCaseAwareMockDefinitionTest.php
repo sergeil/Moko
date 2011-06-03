@@ -40,7 +40,9 @@ class TestCaseAwareMockDefinitionTest extends \PHPUnit_Framework_TestCase
             $this->getMock(__CLASS__),
             'Moko\_MockInterface'
         );
-        $ma->addMethod('doBar', function() {}, 2);
+        $chain = $ma->addMethod('doBar', function() {}, 2);
+
+        $this->assertSame($chain, $ma, "Method chaining doesn't as it expected to.");
 
         $mock = $ma->createMock();
 

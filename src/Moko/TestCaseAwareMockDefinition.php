@@ -87,12 +87,16 @@ class TestCaseAwareMockDefinition extends MockDefinition
 
     /**
      * {@inheritdoc}
+     *
+     * @return \Moko\TestCaseAwareMockDefinition
      */
     public function addMethod($methodName, \Closure $callback, $expectedInvocationCount = null)
     {
-        parent::addMethod($methodName, $callback);
+        $chain = parent::addMethod($methodName, $callback);
 
         $this->definitions[$methodName]['expectedInvocationsCount'] = $expectedInvocationCount;
+
+        return $chain;
     }
 
     /**
