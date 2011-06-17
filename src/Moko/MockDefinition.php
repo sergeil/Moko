@@ -103,7 +103,7 @@ class MockDefinition
      *                            An instance of mock object will be passed as a first parameter of the closure,
      *                            if a method is static then mock's FQCN will be passed instead.
      * @param bool $isStatic
-     * @return \Moko\MockAssembler
+     * @return \Moko\MockDefinition
      */
     public function addMethod($methodName, \Closure $callback)
     {
@@ -151,12 +151,14 @@ class MockDefinition
             get_class_methods($this->getTargetName()),
             array_keys($this->definitions)
         );
-        $data['nonMockedMethodNames'] = $nonMockedMethodNames;
-
+        
         $reflTarget = $this->getReflectedTarget();
         foreach ($reflTarget->getMethods() as $reflMethod) {
-            $methodName = $reflMethod->getName();
+            if ($data['omitConstructor'] && $reflMethod->getName() == '__construct') {
+                continue;
+            }
 
+            $methodName = $reflMethod->getName();
             $data['methods'][$methodName] = $this->createMethodConfigurationArray($reflMethod);
         }
 
@@ -166,7 +168,7 @@ class MockDefinition
 
         $compiledSource = $this->compileTemplate($data);
         eval($compiledSource);
-
+        
         $mockClassName = $data['className'];
         $reflMockClass = new \ReflectionClass($data['namespace'].'\\'.$mockClassName);
 

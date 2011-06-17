@@ -24,7 +24,7 @@
 
 namespace Moko;
 
-require_once '../../src/Moko/ClassLoader.php';
+require_once __DIR__.'/../../src/Moko/ClassLoader.php';
 ClassLoader::register();
 
 use Moko\MockFactory;

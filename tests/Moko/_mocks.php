@@ -20,3 +20,11 @@ class _MockClass
 {
 
 }
+
+class _AnotherMockClass
+{
+    public function __construct($a, $b)
+    {
+
+    }
+}

@@ -127,6 +127,10 @@ class TestCaseAwareMockDefinition extends MockDefinition
                 if (isset($this->definitions[$method])) {
                     $def = $this->definitions[$method];
 
+                    if ($def['expectedInvocationsCount'] === 0) {
+                        continue;
+                    }
+
                     if ($def['expectedInvocationsCount'] !== null && !isset($invocationCounters[$method])) {
                         throw new InvocationExpectationFailureException(
                             $this->targetName, $method,
