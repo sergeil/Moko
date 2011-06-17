@@ -90,11 +90,12 @@ class TestCaseAwareMockDefinition extends MockDefinition
      *
      * @return \Moko\TestCaseAwareMockDefinition
      */
-    public function addMethod($methodName, \Closure $callback, $expectedInvocationCount = null)
+    public function addMethod($methodName, \Closure $callback, $expectedInvocationCount = null, $name = null)
     {
         $chain = parent::addMethod($methodName, $callback);
 
         $this->definitions[$methodName]['expectedInvocationsCount'] = $expectedInvocationCount;
+        $this->definitions[$methodName]['mockAlias'] = $name;
 
         return $chain;
     }
@@ -129,12 +130,14 @@ class TestCaseAwareMockDefinition extends MockDefinition
                     if ($def['expectedInvocationsCount'] !== null && !isset($invocationCounters[$method])) {
                         throw new InvocationExpectationFailureException(
                             $this->targetName, $method,
-                            $def['expectedInvocationsCount'], 0
+                            $def['expectedInvocationsCount'], 0,
+                            $def['mockAlias']
                         );
                     } else if ($def['expectedInvocationsCount'] != $invocationCounters[$method]) {
                         throw new InvocationExpectationFailureException(
                             $this->targetName, $method,
-                            $def['expectedInvocationsCount'], $invocationCounters[$method]
+                            $def['expectedInvocationsCount'], $invocationCounters[$method],
+                            $def['mockAlias']
                         );
                     }
                 }

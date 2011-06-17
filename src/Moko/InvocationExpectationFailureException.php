@@ -32,16 +32,23 @@ class InvocationExpectationFailureException extends \RuntimeException
     protected $expected;
 
     protected $actual;
+    
+    protected $aliasName;
 
-    public function __construct($class, $method, $expected, $actual)
+    public function __construct($class, $method, $expected, $actual, $aliasName = null)
     {
         $this->expected = $expected;
         $this->actual = $actual;
+        $this->aliasName = $aliasName;
 
         $this->message = sprintf(
             'Method %s::%s was expected to be invoked %s times but instead was %s times.',
             $class, $method, $expected, $actual
         );
+
+        if (null !== $aliasName) {
+            $this->message .= "( mock-alias: '$aliasName')";
+        }
     }
 
     public function getActual()
@@ -52,5 +59,10 @@ class InvocationExpectationFailureException extends \RuntimeException
     public function getExpected()
     {
         return $this->expected;
+    }
+
+    public function getAliasName()
+    {
+        return $this->aliasName;
     }
 }

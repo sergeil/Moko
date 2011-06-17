@@ -40,7 +40,7 @@ class TestCaseAwareMockDefinitionTest extends \PHPUnit_Framework_TestCase
             $this->getMock(__CLASS__),
             'Moko\_MockInterface'
         );
-        $chain = $ma->addMethod('doBar', function() {}, 2);
+        $chain = $ma->addMethod('doBar', function() {}, 2, 'Charlie');
 
         $this->assertSame($chain, $ma, "Method chaining doesn't as it expected to.");
 
@@ -51,8 +51,9 @@ class TestCaseAwareMockDefinitionTest extends \PHPUnit_Framework_TestCase
             $ma->verify();
         } catch (InvocationExpectationFailureException $e) {
             $isThrown = true;
-            $this->assertEquals(2, $e->getExpected());
+            $this->assertEquals(2, $e->getExpected(), "Moko\_MockInterface::doBar mock was expected to be invoked 2 times.");
             $this->assertEquals(0, $e->getActual());
+            $this->assertEquals('Charlie', $e->getAliasName(), "Assigned alias name does not match.");
         }
         $this->assertTrue($isThrown);
     }
@@ -86,5 +87,12 @@ class TestCaseAwareMockDefinitionTest extends \PHPUnit_Framework_TestCase
 
         $ma->verify();
     }
-    
+
+    public function testVerify_zeroInvocationCount()
+    {
+        $ma = new TestCaseAwareMockDefinition($this, 'Moko\_MockInterface');
+        $ma->addMethod('doBar', function() {}, 0);
+
+        $ma->verify();
+    }
 }
