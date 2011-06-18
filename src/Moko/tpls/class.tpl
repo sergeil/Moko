@@ -7,6 +7,7 @@ class <?php echo $className ?> <?php echo $targetRelationship ?> \<?php echo $ta
 {
     static public $____callbacks = array();
     static public $____invocationCounters = array();
+    static public $____aliasName = null;
 
     <?php if ($omitConstructor): ?>
     public function __construct()
@@ -25,7 +26,7 @@ class <?php echo $className ?> <?php echo $targetRelationship ?> \<?php echo $ta
 
         <?php if (!$methodDef['isExplicetelyDefined'] && !$suppressUnexpectedInteractionExceptions): ?>
         throw new \Moko\UnexpectedInteractionException(
-            "Method '<?php echo $methodName?>' from mock of \<?php echo $targetName ?> is not expected to be invoked."
+            __CLASS__, __METHOD__, self::$____aliasName
         );
         <?php else:?>
             <?php $methodParams = implode(' ,', $methodDef['paramNames'])?>

@@ -33,7 +33,7 @@ class MockDefinition
      * @var string
      */
     protected $targetName;
-
+    
     /**
      * @var array
      */
@@ -83,9 +83,9 @@ class MockDefinition
      *
      * @throws \InvalidArgumentException  If a $targetName class/interface doesn't exist
      * @param string $targetName  Name of an interface/class name you want to mock
-     * @param boolean $omitConstructor Wether the parent's constructor should be overriden with a non-parameters one
+     * @param boolean $omitConstructor If the parent's constructor should be overriden with a non-parameters one
      */
-    public function __construct($targetName, $omitConstructor = false)
+    public function __construct($targetName, $omitConstructor = true)
     {
         if (!class_exists($targetName) && !interface_exists($targetName)) {
             throw new \InvalidArgumentException(
@@ -171,14 +171,7 @@ class MockDefinition
         return $this;
     }
 
-    /**
-     * @param array $constructorParams  Parameters that you want to pass to the constructor
-     * @param boolean $suppressUnexpectedInteractionExceptions  By default if you haven't explicetely mocked a method
-     *                                                          then {@class Moko\UnexpectedInteractionException} will be thrown, use
-     *                                                          this parameters to change this behaviour.
-     * @return object  An instance of provided in constructor $targetName
-     */
-    public function createMock(array $constructorParams = array(), $suppressUnexpectedInteractionExceptions = false)
+    protected function createTemplateData($constructorParams, $suppressUnexpectedInteractionExceptions)
     {
         // this one will be used while compiling the template
         $data = array(
@@ -197,7 +190,7 @@ class MockDefinition
             get_class_methods($this->getTargetName()),
             array_keys($this->definitions)
         );
-        
+
         $reflTarget = $this->getReflectedTarget();
         foreach ($reflTarget->getMethods() as $reflMethod) {
             // omitted constuctor will be properly handled in the template itself
@@ -213,13 +206,28 @@ class MockDefinition
         $data['targetRelationship'] = $reflTarget->isInterface() ?  'implements' : 'extends';
         $data['targetDocBlock'] = $reflTarget->getDocComment();
 
+        return $data;
+    }
+
+    /**
+     * @param array $constructorParams  Parameters that you want to pass to the constructor
+     * @param string $aliasName  You may this an alias to simplify distinguishing produced mock-objects
+     * @param boolean $suppressUnexpectedInteractionExceptions  By default if you haven't explicetely mocked a method
+     *                                                          then {@class Moko\UnexpectedInteractionException} will be thrown, use
+     *                                                          this parameters to change this behaviour.
+     * @return object  An instance of provided in constructor $targetName
+     */
+    public function createMock(array $constructorParams = array(), $aliasName = null, $suppressUnexpectedInteractionExceptions = false)
+    {
+        $data = $this->createTemplateData($constructorParams, $suppressUnexpectedInteractionExceptions);
+
         $compiledSource = $this->compileTemplate($data);
         eval($compiledSource);
         
         $mockClassName = $data['className'];
         $reflMockClass = new \ReflectionClass($data['namespace'].'\\'.$mockClassName);
-
-        $obj = $reflTarget->hasMethod('__construct') ? $reflMockClass->newInstanceArgs($constructorParams) : $reflMockClass->newInstance();
+        
+        $obj = $this->getReflectedTarget()->hasMethod('__construct') ? $reflMockClass->newInstanceArgs($constructorParams) : $reflMockClass->newInstance();
 
         $callbacks = array();
         foreach ($this->definitions as $methodName=>$methodDef) {
@@ -227,8 +235,9 @@ class MockDefinition
                 $callbacks[$methodName] = $methodDef['callback'];
             }
         }
-        $reflMock = new \ReflectionClass($reflTarget->getNamespaceName().'\\'.$mockClassName);
+        $reflMock = new \ReflectionClass($this->getReflectedTarget()->getNamespaceName().'\\'.$mockClassName);
         $reflMock->getProperty('____callbacks')->setValue(null, $callbacks);
+        $reflMock->getProperty('____aliasName')->setValue(null, $aliasName);
 
         return $obj;
     }

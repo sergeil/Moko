@@ -41,6 +41,11 @@ class TestCaseAwareMockDefinition extends MockDefinition
      * @var \PHPUnit_Framework_TestCase
      */
     protected $testCase;
+    
+    /**
+     * @var string
+     */
+    protected $aliasName;
 
     /**
      * Holds all mock objects that were dispensed by this instance
@@ -59,13 +64,22 @@ class TestCaseAwareMockDefinition extends MockDefinition
     }
 
     /**
+     * @return string
+     */
+    public function getAliasName()
+    {
+        return $this->aliasName;
+    }
+
+    /**
      * {@inheritdoc}
      */
-    public function __construct(\PHPUnit_Framework_TestCase $testCase, $targetName, $omitConstructor = false)
+    public function __construct(\PHPUnit_Framework_TestCase $testCase, $targetName, $aliasName = null, $omitConstructor = true)
     {
         parent::__construct($targetName, $omitConstructor);
 
         $this->testCase = $testCase;
+        $this->aliasName = $aliasName;
         $this->hackTestCase();
     }
 
@@ -93,12 +107,12 @@ class TestCaseAwareMockDefinition extends MockDefinition
      *
      * @return \Moko\TestCaseAwareMockDefinition
      */
-    public function addMethod($methodName, \Closure $callback, $expectedInvocationCount = null, $name = null)
+    public function addMethod($methodName, \Closure $callback, $expectedInvocationCount = null /*, $name = null*/)
     {
         $chain = parent::addMethod($methodName, $callback);
 
         $this->definitions[$methodName]['expectedInvocationsCount'] = $expectedInvocationCount;
-        $this->definitions[$methodName]['mockAlias'] = $name;
+        //$this->definitions[$methodName]['mockAlias'] = $name;
 
         return $chain;
     }
@@ -119,9 +133,9 @@ class TestCaseAwareMockDefinition extends MockDefinition
     /**
      * {@inheritdoc}
      */
-    public function createMock(array $constructorParams = array(), $suppressUnexpectedInteractionExceptions = false)
+    public function createMock(array $constructorParams = array(), $aliasName = null, $suppressUnexpectedInteractionExceptions = false)
     {
-        $mock = parent::createMock($constructorParams, $suppressUnexpectedInteractionExceptions);
+        $mock = parent::createMock($constructorParams, $aliasName, $suppressUnexpectedInteractionExceptions);
         $this->dispensedMocks[] = $mock;
         
         return $mock;
@@ -147,17 +161,19 @@ class TestCaseAwareMockDefinition extends MockDefinition
                         continue;
                     }
 
+                    $aliasName = $reflMock->getProperty('____aliasName')->getValue(null);
+
                     if ($def['expectedInvocationsCount'] !== null && !isset($invocationCounters[$method])) {
                         throw new InvocationExpectationFailureException(
                             $this->targetName, $method,
                             $def['expectedInvocationsCount'], 0,
-                            $def['mockAlias']
+                            $aliasName
                         );
                     } else if ($def['expectedInvocationsCount'] != $invocationCounters[$method]) {
                         throw new InvocationExpectationFailureException(
                             $this->targetName, $method,
                             $def['expectedInvocationsCount'], $invocationCounters[$method],
-                            $def['mockAlias']
+                            $aliasName
                         );
                     }
                 }

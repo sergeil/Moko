@@ -32,4 +32,54 @@ namespace Moko;
  */ 
 class UnexpectedInteractionException extends \RuntimeException
 {
+    /**
+     * @var string
+     */
+    protected $class;
+
+    /**
+     * @var string
+     */
+    protected $method;
+
+    /**
+     * @var string
+     */
+    protected $aliasName;
+
+    /**
+     * @return string
+     */
+    public function getAliasName()
+    {
+        return $this->aliasName;
+    }
+
+    /**
+     * @return string
+     */
+    public function getClass()
+    {
+        return $this->class;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMethod()
+    {
+        return $this->method;
+    }
+
+    public function __construct($class, $method, $aliasName = null)
+    {
+        $this->class = $class;
+        $this->method = $method;
+        $this->aliasName = $aliasName;
+
+        $this->message = "%s::%s wasn't expected to be invoked.";
+        if (null !== $aliasName) {
+            $this->message .= "( mock-alias: $aliasName )";
+        }
+    }
 }

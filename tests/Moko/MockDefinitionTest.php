@@ -36,9 +36,13 @@ class MockDefinitionTest extends \PHPUnit_Framework_TestCase
 {
     public function test__construct()
     {
-        $ma1 = new MockDefinition('Moko\_MockInterface', true);
-        $this->assertEquals('Moko\_MockInterface', $ma1->getTargetName());
-        $this->assertTrue($ma1->isConstructorOmitted());
+        $ma1 = new MockDefinition('Moko\_MockInterface');
+        $this->assertEquals(
+            'Moko\_MockInterface',
+            $ma1->getTargetName(),
+            'Target name passed to constructor and value returned by "getTargetName" diverged.'
+        );
+        $this->assertTrue($ma1->isConstructorOmitted(), 'By default constructor should be omitted.');
 
         $ma2 = new MockDefinition('Moko\_MockClass', false);
         $this->assertEquals('Moko\_MockClass', $ma2->getTargetName());
@@ -50,7 +54,7 @@ class MockDefinitionTest extends \PHPUnit_Framework_TestCase
      */
     public function test__createMockWithOmittedConstructor()
     {
-        $ma1 = new MockDefinition('Moko\_AnotherMockClass', true);
+        $ma1 = new MockDefinition('Moko\_AnotherMockClass');
         $ma1->createMock();
     }
 
@@ -64,7 +68,7 @@ class MockDefinitionTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateMock_interface()
     {
-        $ma = new MockDefinition('Moko\_MockInterface');
+        $ma = new MockDefinition('Moko\_MockInterface', null, false);
         $ma->addMethod('doFoo', function($cx, $param1) {
             $cx->param1Value = $param1; // dynamically creating a new variable
         });
@@ -77,7 +81,7 @@ class MockDefinitionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($ma, $chainedMa);
 
-        $instance = $ma->createMock();
+        $instance = $ma->createMock(array(), 'FooAlias');
         $this->assertTrue($instance instanceof _MockInterface);
 
         $instance->doFoo('foobaz');
@@ -91,6 +95,7 @@ class MockDefinitionTest extends \PHPUnit_Framework_TestCase
             $instance->doBar();
         } catch (UnexpectedInteractionException $e) {
             $isThrown = true;
+            $this->assertEquals('FooAlias', $e->getAliasName());
         }
         $this->assertTrue($isThrown);
         
@@ -112,14 +117,14 @@ class MockDefinitionTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateMock_class()
     {
-        $ma1 = new MockDefinition('Moko\_MockClass', true);
+        $ma1 = new MockDefinition('Moko\_MockClass');
         $instance = $ma1->createMock();
         $this->assertTrue($instance instanceof _MockClass);
     }
 
     public function testCreateMock_withDelegateMethod()
     {
-        $ma = new MockDefinition('Moko\_MockDelegateClass');
+        $ma = new MockDefinition('Moko\_MockDelegateClass', null, false);
         $maChain = $ma->addDelegateMethod('doFoo');
 
         $this->assertSame($ma, $maChain);
