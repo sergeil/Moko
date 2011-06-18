@@ -28,16 +28,20 @@ class <?php echo $className ?> <?php echo $targetRelationship ?> \<?php echo $ta
             "Method '<?php echo $methodName?>' from mock of \<?php echo $targetName ?> is not expected to be invoked."
         );
         <?php else:?>
-        $callback = self::$____callbacks['<?php echo $methodName ?>'];
-        return $callback(
-            <?php echo $methodDef['isStatic'] ? '__CLASS__' : '$this' ?>
-            <?php
-            if (sizeof($methodDef['paramNames'])) {
-                echo ', ';
-                echo implode(' ,', $methodDef['paramNames']);
-            }
-            ?>
-        );
+            <?php $methodParams = implode(' ,', $methodDef['paramNames'])?>
+            <?php if ($methodDef['isDelegate'] === true): ?>
+                return parent::<?php echo $methodName ?>(<?php echo $methodParams ?>);
+            <?php else: ?>
+                $callback = self::$____callbacks['<?php echo $methodName ?>'];
+                return $callback(
+                    <?php echo $methodDef['isStatic'] ? '__CLASS__' : '$this' ?>
+                    <?php
+                    if (sizeof($methodDef['paramNames'])) { // appending original parameters
+                        echo ', '.$methodParams;
+                    }
+                    ?>
+                );
+            <?php endif ?>
         <?php endif ?>
     }
     <?php endforeach; ?>

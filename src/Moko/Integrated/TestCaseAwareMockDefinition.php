@@ -106,6 +106,19 @@ class TestCaseAwareMockDefinition extends MockDefinition
     /**
      * {@inheritdoc}
      */
+    public function addDelegateMethod($methodName, $expectedInvocationCount = null)
+    {
+        $chain = parent::addDelegateMethod($methodName);
+
+        $this->definitions[$methodName]['expectedInvocationsCount'] = $expectedInvocationCount;
+        $this->definitions[$methodName]['mockAlias'] = ''; // TODO get rid of it
+
+        return $chain;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function createMock(array $constructorParams = array(), $suppressUnexpectedInteractionExceptions = false)
     {
         $mock = parent::createMock($constructorParams, $suppressUnexpectedInteractionExceptions);

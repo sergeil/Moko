@@ -28,3 +28,18 @@ class _AnotherMockClass
 
     }
 }
+
+class _MockDelegateClass
+{
+    public $foo = 'foo';
+
+    public function doFoo()
+    {
+        $this->foo = 'foo-foo';
+    }
+
+    public function doBar()
+    {
+
+    }
+}

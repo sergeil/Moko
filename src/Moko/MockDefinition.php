@@ -97,29 +97,71 @@ class MockDefinition
     }
 
     /**
-     * @throws \InvalidArgumentException  If the provided method is not declared in target's class/interface
      * @param  string $methodName
      * @param \Closure $callback  A closure that will be invoked when an original method is invoked.
      *                            An instance of mock object will be passed as a first parameter of the closure,
      *                            if a method is static then mock's FQCN will be passed instead.
-     * @param bool $isStatic
      * @return \Moko\MockDefinition
      */
     public function addMethod($methodName, \Closure $callback)
     {
+        $this->checkMethodExistence($methodName);
+
+        $this->definitions[$methodName] = array(
+            'isDelegate' => false,
+            'isDynamic' => false,
+            'callback' => $callback
+        );
+
+        return $this;
+    }
+
+    /**
+     * @throws \InvalidArgumentException  If the provided method is not declared in target's class/interface
+     * @param  $methodName
+     * @return void
+     */
+    protected function checkMethodExistence($methodName)
+    {
         if (!$this->getReflectedTarget()->hasMethod($methodName)) {
             $targetType = $this->getReflectedTarget()->isInterface() ? 'interface' : 'class';
             $msg = sprintf(
-                "Method %s::%s you are attempting to mock is not declared in %s %s. If you need to mock a method which is not declared in %s, then use 'addDynamicMethod' instead!",
+                "Method %s::%s you are attempting to mock is not declared in %s %s.",
                 $this->getTargetName(), $methodName, $targetType,
                 $this->getTargetName(), $this->getTargetName()
             );
             throw new \InvalidArgumentException($msg);
         }
+    }
+
+    /**
+     * @throws \InvalidArgumentException
+     * @param  $methodName
+     * @return \Moko\MockDefinition
+     */
+    public function addDelegateMethod($methodName)
+    {
+        $rt = $this->getReflectedTarget();
+        if ($rt->isInterface()) {
+            $msg = 'Method %s::%s cannot be mocked because target (%s) you are mocking out is an interface, ';
+            $msg .= 'delegate methods can be created only for non-abstract methods.';
+            $msg = sprintf(
+                $msg,
+                $this->getTargetName(), $methodName, $this->getTargetName()
+            );
+            throw new \InvalidArgumentException($msg);
+        }
+        $this->checkMethodExistence($methodName);
+        if ($rt->getMethod($methodName)->isAbstract()) {
+            $msg = sprintf(
+                "Unable to create a delegate method for method %s::%s because it is abstract!",
+                $this->getTargetName(), $methodName
+            );
+            throw new \InvalidArgumentException($msg);
+        }
 
         $this->definitions[$methodName] = array(
-            'isDynamic' => false,
-            'callback' => $callback
+            'isDelegate' => true
         );
 
         return $this;
@@ -154,6 +196,7 @@ class MockDefinition
         
         $reflTarget = $this->getReflectedTarget();
         foreach ($reflTarget->getMethods() as $reflMethod) {
+            // omitted constuctor will be properly handled in the template itself
             if ($data['omitConstructor'] && $reflMethod->getName() == '__construct') {
                 continue;
             }
@@ -176,7 +219,9 @@ class MockDefinition
 
         $callbacks = array();
         foreach ($this->definitions as $methodName=>$methodDef) {
-            $callbacks[$methodName] = $methodDef['callback'];
+            if (!$this->definitions[$methodName]['isDelegate']) { // no callback should exist for delegate methods
+                $callbacks[$methodName] = $methodDef['callback'];
+            }
         }
         $reflMock = new \ReflectionClass($reflTarget->getNamespaceName().'\\'.$mockClassName);
         $reflMock->getProperty('____callbacks')->setValue(null, $callbacks);
@@ -186,16 +231,21 @@ class MockDefinition
 
     private function createMethodConfigurationArray(\ReflectionMethod $reflMethod)
     {
+        // these ones will be used to create a proper callback invocation
         $paramNames = array();
         foreach ($reflMethod->getParameters() as $reflParam) {
             $paramNames[] = '$'.$reflParam->getName();
         }
 
+        // having abstract methods is not allowed
         $modifiers = array_flip(\Reflection::getModifierNames($reflMethod->getModifiers()));
         unset($modifiers['abstract']);
         $modifiers = array_flip($modifiers);
 
+        $isDelegate = isset($this->definitions[$reflMethod->getName()]) && $this->definitions[$reflMethod->getName()]['isDelegate'] === true;
+
         return array(
+            'isDelegate' => $isDelegate,
             'isExplicetelyDefined' => isset($this->definitions[$reflMethod->getName()]),
             'docBlock' => $reflMethod->getDocComment(),
             'modifiers' => $modifiers,

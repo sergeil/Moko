@@ -116,4 +116,36 @@ class MockDefinitionTest extends \PHPUnit_Framework_TestCase
         $instance = $ma1->createMock();
         $this->assertTrue($instance instanceof _MockClass);
     }
+
+    public function testCreateMock_withDelegateMethod()
+    {
+        $ma = new MockDefinition('Moko\_MockDelegateClass');
+        $maChain = $ma->addDelegateMethod('doFoo');
+
+        $this->assertSame($ma, $maChain);
+
+        /* @var \Moko\_MockDelegateClass $mock */
+        $mock = $ma->createMock();
+
+        $this->assertTrue($mock instanceof \Moko\_MockDelegateClass);
+
+        $this->assertEquals('foo', $mock->foo);
+        $mock->doFoo();
+        $this->assertEquals(
+            'foo-foo',
+            $mock->foo,
+            sprintf("Parent method Moko\_MockDelegateClass::doFoo was not invoked, in other words - parent method wasn't invoked.")
+        );
+
+        $isThrown = false;
+        try {
+            $mock->doBar();
+        } catch (UnexpectedInteractionException $e) {
+            $isThrown = true;
+        }
+        $this->assertTrue(
+            $isThrown,
+            '\Moko\UnexpectedInteractionException exception must have been thrown for a method with no manually callback defined'
+        );
+    }
 }

@@ -97,4 +97,47 @@ class TestCaseAwareMockDefinitionTest extends \PHPUnit_Framework_TestCase
 
         $ma->verify();
     }
+
+    public function testVerify_delegateMethodWithOneInvocation()
+    {
+        $ma = new TestCaseAwareMockDefinition($this, 'Moko\_MockDelegateClass');
+        $ma->addDelegateMethod('doFoo', 1);
+
+        /* @var \Moko\_MockDelegateClass $obj */
+        $obj = $ma->createMock();
+
+        $this->assertTrue(
+            $obj instanceof \Moko\_MockDelegateClass,
+            sprintf(
+                'Created mock object is expected to be of type "%s" but actually is "%s".',
+                '\Moko\_MockDelegateClass', get_class($obj)
+            )
+        );
+
+        $obj->doFoo();
+
+        $this->assertEquals(
+            'foo-foo',
+            $obj->foo,
+            'It seems that the "doFoo" parent method was not invoked because this method should have updated Moko\_MockDelegateClass::$foo property'
+        );
+
+        $ma->verify();
+    }
+
+    /**
+     * @expectedException Moko\InvocationExpectationFailureException
+     */
+    public function testVerify_delegateMethodExpectationFailure()
+    {
+        $ma = new TestCaseAwareMockDefinition(
+            $this->getMock(__CLASS__),
+            'Moko\_MockDelegateClass'
+        );
+        $ma->addDelegateMethod('doFoo', 1);
+
+        $obj = $ma->createMock();
+
+        $ma->verify();
+    }
 }
