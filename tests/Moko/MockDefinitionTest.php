@@ -26,8 +26,8 @@ namespace Moko;
 
 require_once '_mocks.php';
 
-require_once __DIR__.'/../../src/Moko/ClassLoader.php';
-ClassLoader::register();
+require_once __DIR__.'/../../src/Moko/Tools/ClassLoader.php';
+\Moko\Tools\ClassLoader::register();
 
 /**
  * @author Sergei Lissovski <sergei.lissovski@gmail.com>

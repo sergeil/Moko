@@ -22,7 +22,10 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-namespace Moko;
+namespace Moko\Integrated;
+
+use Moko\MockDefinition,
+    Moko\InvocationExpectationFailureException;
 
 /**
  * This class hacks PHPUnit_Framework_TestCase class and

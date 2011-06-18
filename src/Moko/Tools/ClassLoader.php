@@ -22,7 +22,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-namespace Moko;
+namespace Moko\Tools;
 
 /**
  * This loader will scan the include_path as well.
@@ -45,7 +45,7 @@ class ClassLoader
     {
         $filename = str_replace(array('\\', '_'), DIRECTORY_SEPARATOR, $className);
         if (preg_match('/^Moko.*/', $filename)) { // our classes need a special treatment
-            $filename = realpath(__DIR__.'/../'.$filename.'.php');
+            $filename = realpath(__DIR__.'/../../'.$filename.'.php');
         } else {
             $filename =  $filename.'.php';
         }

@@ -22,46 +22,14 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-namespace Moko;
-
-require_once __DIR__ . '/../../src/Moko/Tools/ClassLoader.php';
-\Moko\Tools\ClassLoader::register();
-
-use Moko\MockFactory;
+namespace Moko\Integrated;
 
 /**
- * @author Sergei Lissovski <sergei.lissovski@gmail.org>
- */ 
-class MockFactoryTest extends \PHPUnit_Framework_TestCase
+ * TODO not implemented yet
+ *
+ * @author Sergei Lissovski <sergei.lissovski@gmail.com>
+ */
+final class TestCase extends \PHPUnit_Framework_TestCase
 {
-    public function test__construct()
-    {
-        $mf1 = new MockFactory($this);
-        $mf2 = new MockFactory();
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function test__constructor_invalidArgument()
-    {
-        $mf = new MockFactory('scalar');
-    }
-
-    public function testCreate()
-    {
-        $mf = new MockFactory($this);
-
-        $md = $mf->create('stdClass');
-        $this->assertTrue($md instanceof \Moko\MockDefinition);
-    }
-
-    public function testCreateTestCaseAware()
-    {
-        $mf = new MockFactory($this);
-
-        $md = $mf->createTestCaseAware('stdClass');
-        $this->assertTrue($md instanceof \Moko\Integrated\TestCaseAwareMockDefinition);
-        $this->assertSame($this, $md->getTestCase());
-    }
+    
 }

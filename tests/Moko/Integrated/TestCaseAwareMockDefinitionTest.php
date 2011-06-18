@@ -22,12 +22,14 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-namespace Moko;
+namespace Moko\Integrated;
 
-require_once '_mocks.php';
+require_once __DIR__.'/../_mocks.php';
 
-require_once __DIR__.'/../../src/Moko/ClassLoader.php';
-ClassLoader::register();
+require_once __DIR__ . '/../../../src/Moko/Tools/ClassLoader.php';
+\Moko\Tools\ClassLoader::register();
+
+use Moko\InvocationExpectationFailureException;
 
 /**
  * @author Sergei Lissovski <sergei.lissovski@gmail.com>
