@@ -41,11 +41,6 @@ class TestCaseAwareMockDefinition extends MockDefinition
      * @var \PHPUnit_Framework_TestCase
      */
     protected $testCase;
-    
-    /**
-     * @var string
-     */
-    protected $aliasName;
 
     /**
      * Holds all mock objects that were dispensed by this instance
@@ -64,22 +59,13 @@ class TestCaseAwareMockDefinition extends MockDefinition
     }
 
     /**
-     * @return string
-     */
-    public function getAliasName()
-    {
-        return $this->aliasName;
-    }
-
-    /**
      * {@inheritdoc}
      */
-    public function __construct(\PHPUnit_Framework_TestCase $testCase, $targetName, $aliasName = null, $omitConstructor = true)
+    public function __construct(\PHPUnit_Framework_TestCase $testCase, $targetName, $omitConstructor = true)
     {
         parent::__construct($targetName, $omitConstructor);
 
         $this->testCase = $testCase;
-        $this->aliasName = $aliasName;
         $this->hackTestCase();
     }
 
