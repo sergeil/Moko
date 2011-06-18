@@ -77,7 +77,10 @@ class UnexpectedInteractionException extends \RuntimeException
         $this->method = $method;
         $this->aliasName = $aliasName;
 
-        $this->message = "%s::%s wasn't expected to be invoked.";
+        $this->message = sprintf(
+            "%s::%s wasn't expected to be invoked.",
+            $class, $method
+        );
         if (null !== $aliasName) {
             $this->message .= "( mock-alias: $aliasName )";
         }

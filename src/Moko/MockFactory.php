@@ -57,7 +57,7 @@ class MockFactory
      * @see MockAssembler::__construct()
      * @return MockDefinition
      */
-    public function create($targetName, $omitConstructor = false)
+    public function create($targetName, $omitConstructor = true)
     {
         return new MockDefinition($targetName, $omitConstructor);
     }
@@ -66,7 +66,7 @@ class MockFactory
      * @see TestCaseAwareMockDefinition::__construct()
      * @return TestCaseAwareMockDefinition
      */
-    public function createTestCaseAware($targetName, $omitConstructor = false)
+    public function createTestCaseAware($targetName, $omitConstructor = true)
     {
         return new \Moko\Integrated\TestCaseAwareMockDefinition($this->testCase, $targetName, $omitConstructor);
     }
