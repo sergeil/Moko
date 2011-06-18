@@ -78,7 +78,8 @@ class MockDefinition
     }
 
     /**
-     * If targetName interface/class hasn't been loaded yet we will try to load it behind the scene.
+     * If targetName interface/class hasn't been loaded yet we will try to load it behind the scene,
+     * it is up to you to register your class-loaders beforehand.
      *
      * @throws \InvalidArgumentException  If a $targetName class/interface doesn't exist
      * @param string $targetName  Name of an interface/class name you want to mock
@@ -135,7 +136,10 @@ class MockDefinition
     }
 
     /**
-     * @throws \InvalidArgumentException
+     * Allows to invoke a parent method of mocked class, the stress here is - class, you are
+     * not able to invoke methods from interface because they have no bodies.
+     *
+     * @throws \InvalidArgumentException  If mocking target is interface or method is marked as abstract
      * @param  $methodName
      * @return \Moko\MockDefinition
      */
