@@ -152,4 +152,10 @@ class MockDefinitionTest extends \PHPUnit_Framework_TestCase
             '\Moko\UnexpectedInteractionException exception must have been thrown for a method with no manually callback defined'
         );
     }
+
+    public function testCreateMock_forClasswithFinalMethods()
+    {
+        $ma = new MockDefinition('Moko\_MockWithFinalMethod');
+        $obj = $ma->createMock();
+    }
 }

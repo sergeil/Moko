@@ -43,3 +43,16 @@ class _MockDelegateClass
 
     }
 }
+
+class _MockWithFinalMethod
+{
+    final function doFoo()
+    {
+
+    }
+
+    public function doBar()
+    {
+        
+    }
+}

@@ -193,8 +193,10 @@ class MockDefinition
 
         $reflTarget = $this->getReflectedTarget();
         foreach ($reflTarget->getMethods() as $reflMethod) {
-            // omitted constuctor will be properly handled in the template itself
-            if ($data['omitConstructor'] && $reflMethod->getName() == '__construct') {
+            // omitted constructor will be properly handled in the template itself
+            // and there's no way to override final methods - skipping them too
+            if (($data['omitConstructor'] && $reflMethod->getName() == '__construct') ||
+                $reflMethod->isFinal()) {
                 continue;
             }
 
