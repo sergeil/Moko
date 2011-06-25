@@ -157,5 +157,21 @@ class MockDefinitionTest extends \PHPUnit_Framework_TestCase
     {
         $ma = new MockDefinition('Moko\_MockWithFinalMethod');
         $obj = $ma->createMock();
+
+        $this->assertType('Moko\_MockWithFinalMethod', $obj);
+    }
+
+    public function testCreateMock_withShorthandAliasDefinition()
+    {
+        $ma = new MockDefinition('Moko\_MockWithFinalMethod');
+        $ma->addMethod('doBar', '"foo-bar"');
+
+        $obj = $ma->createMock();
+        $this->assertType('Moko\_MockWithFinalMethod', $obj);
+        $this->assertEquals(
+            'foo-bar',
+            $obj->doBar(),
+            'If second parameter of the addMethod() method is not a callback then one should be created automatically and return a passed value.'
+        );
     }
 }

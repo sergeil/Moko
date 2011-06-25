@@ -93,9 +93,9 @@ class TestCaseAwareMockDefinition extends MockDefinition
      *
      * @return \Moko\TestCaseAwareMockDefinition
      */
-    public function addMethod($methodName, \Closure $callback, $expectedInvocationCount = null /*, $name = null*/)
+    public function addMethod($methodName, $callbackOrReturnValue, $expectedInvocationCount = null /*, $name = null*/)
     {
-        $chain = parent::addMethod($methodName, $callback);
+        $chain = parent::addMethod($methodName, $callbackOrReturnValue);
 
         $this->definitions[$methodName]['expectedInvocationsCount'] = $expectedInvocationCount;
         //$this->definitions[$methodName]['mockAlias'] = $name;

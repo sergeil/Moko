@@ -99,40 +99,23 @@ class MockDefinition
 
     /**
      * @param  string $methodName
-     * @param \Closure $callback  A closure that will be invoked when an original method is invoked.
-     *                            An instance of mock object will be passed as a first parameter of the closure,
-     *                            if a method is static then mock's FQCN will be passed instead.
+     * @param \Closure|string $callbackOrReturnValue  A closure that will be invoked when an original method is invoked.
+     *                                                An instance of mock object will be passed as a first parameter of the closure,
+     *                                                if a method is static then mock's FQCN will be passed instead. Also it is possible
+     *                                                to pass a liternal or snippet of valid php code to be returned when a method is invoked.
      * @return \Moko\MockDefinition
      */
-    public function addMethod($methodName, \Closure $callback)
+    public function addMethod($methodName, $callbackOrReturnValue)
     {
         $this->checkMethodExistence($methodName);
 
         $this->definitions[$methodName] = array(
             'isDelegate' => false,
             'isDynamic' => false,
-            'callback' => $callback
+            'callback' => $callbackOrReturnValue
         );
 
         return $this;
-    }
-
-    /**
-     * @throws \InvalidArgumentException  If the provided method is not declared in target's class/interface
-     * @param  $methodName
-     * @return void
-     */
-    protected function checkMethodExistence($methodName)
-    {
-        if (!$this->getReflectedTarget()->hasMethod($methodName)) {
-            $targetType = $this->getReflectedTarget()->isInterface() ? 'interface' : 'class';
-            $msg = sprintf(
-                "Method %s::%s you are attempting to mock is not declared in %s %s.",
-                $this->getTargetName(), $methodName, $targetType,
-                $this->getTargetName(), $this->getTargetName()
-            );
-            throw new \InvalidArgumentException($msg);
-        }
     }
 
     /**
@@ -171,6 +154,24 @@ class MockDefinition
         return $this;
     }
 
+    /**
+     * @throws \InvalidArgumentException  If the provided method is not declared in target's class/interface
+     * @param  $methodName
+     * @return void
+     */
+    protected function checkMethodExistence($methodName)
+    {
+        if (!$this->getReflectedTarget()->hasMethod($methodName)) {
+            $targetType = $this->getReflectedTarget()->isInterface() ? 'interface' : 'class';
+            $msg = sprintf(
+                "Method %s::%s you are attempting to mock is not declared in %s %s.",
+                $this->getTargetName(), $methodName, $targetType,
+                $this->getTargetName(), $this->getTargetName()
+            );
+            throw new \InvalidArgumentException($msg);
+        }
+    }
+
     protected function createTemplateData($constructorParams, $suppressUnexpectedInteractionExceptions)
     {
         // this one will be used while compiling the template
@@ -184,11 +185,6 @@ class MockDefinition
             'targetDocBlock' => '',
             'targetName' => $this->getTargetName(),
             'nonMockedMethodNames' => array()
-        );
-
-        $nonMockedMethodNames = array_diff(
-            get_class_methods($this->getTargetName()),
-            array_keys($this->definitions)
         );
 
         $reflTarget = $this->getReflectedTarget();
@@ -210,6 +206,64 @@ class MockDefinition
 
         return $data;
     }
+
+    private function createMethodConfigurationArray(\ReflectionMethod $reflMethod)
+    {
+        $methodName = $reflMethod->getName();
+
+        // these ones will be used to create a proper callback invocation
+        $paramNames = array();
+        foreach ($reflMethod->getParameters() as $reflParam) {
+            $paramNames[] = '$'.$reflParam->getName();
+        }
+
+        // having abstract methods is not allowed
+        $modifiers = array_flip(\Reflection::getModifierNames($reflMethod->getModifiers()));
+        unset($modifiers['abstract']);
+        $modifiers = array_flip($modifiers);
+
+        $isDelegate = isset($this->definitions[$reflMethod->getName()]) && $this->definitions[$reflMethod->getName()]['isDelegate'] === true;
+
+        return array(
+            'isDelegate' => $isDelegate,
+            'isExplicetelyDefined' => isset($this->definitions[$reflMethod->getName()]),
+            'docBlock' => $reflMethod->getDocComment(),
+            'modifiers' => $modifiers,
+            'params' => $this->createMethodParams($reflMethod),
+            'paramNames' => $paramNames,
+            'isStatic' => $reflMethod->isStatic(),
+            'callback' => isset($this->definitions[$methodName]) && isset($this->definitions[$methodName]['callback']) ? $this->definitions[$methodName]['callback'] : null
+        );
+    }
+
+    private function createMethodParams(\ReflectionMethod $reflMethod)
+    {
+        $paramsArray = array();
+
+        foreach ($reflMethod->getParameters() as $methodParam) {
+            $signature = '';
+
+            if (is_object($methodParam->getClass())) {
+                $signature .= '\\'.$methodParam->getClass()->getName().' ';
+            } else if ($methodParam->isArray()) {
+                $signature .= 'array ';
+            }
+
+            $signature = $signature.'$'.$methodParam->getName();
+
+            if ($methodParam->isDefaultValueAvailable()) {
+                $computedDefaultValue = var_export($methodParam->getDefaultValue(), true);
+
+                $signature .= ' = '.$computedDefaultValue;
+            }
+
+            $paramsArray[] = $signature;
+        }
+
+        return $paramsArray;
+    }
+
+    static $cz = 0;
 
     /**
      * @param array $constructorParams  Parameters that you want to pass to the constructor
@@ -242,59 +296,6 @@ class MockDefinition
         $reflMock->getProperty('____aliasName')->setValue(null, $aliasName);
 
         return $obj;
-    }
-
-    private function createMethodConfigurationArray(\ReflectionMethod $reflMethod)
-    {
-        // these ones will be used to create a proper callback invocation
-        $paramNames = array();
-        foreach ($reflMethod->getParameters() as $reflParam) {
-            $paramNames[] = '$'.$reflParam->getName();
-        }
-
-        // having abstract methods is not allowed
-        $modifiers = array_flip(\Reflection::getModifierNames($reflMethod->getModifiers()));
-        unset($modifiers['abstract']);
-        $modifiers = array_flip($modifiers);
-
-        $isDelegate = isset($this->definitions[$reflMethod->getName()]) && $this->definitions[$reflMethod->getName()]['isDelegate'] === true;
-
-        return array(
-            'isDelegate' => $isDelegate,
-            'isExplicetelyDefined' => isset($this->definitions[$reflMethod->getName()]),
-            'docBlock' => $reflMethod->getDocComment(),
-            'modifiers' => $modifiers,
-            'params' => $this->createMethodParams($reflMethod),
-            'paramNames' => $paramNames,
-            'isStatic' => $reflMethod->isStatic()
-        );
-    }
-
-    private function createMethodParams(\ReflectionMethod $reflMethod)
-    {
-        $paramsArray = array();
-
-        foreach ($reflMethod->getParameters() as $methodParam) {
-            $signature = '';
-
-            if (is_object($methodParam->getClass())) {
-                $signature .= '\\'.$methodParam->getClass()->getName().' ';
-            } else if ($methodParam->isArray()) {
-                $signature .= 'array ';
-            }
-
-            $signature = $signature.'$'.$methodParam->getName();
-
-            if ($methodParam->isDefaultValueAvailable()) {
-                $computedDefaultValue = var_export($methodParam->getDefaultValue(), true);
-
-                $signature .= ' = '.$computedDefaultValue;
-            }
-
-            $paramsArray[] = $signature;
-        }
-        
-        return $paramsArray;
     }
 
     protected function getTemplateFilename()
