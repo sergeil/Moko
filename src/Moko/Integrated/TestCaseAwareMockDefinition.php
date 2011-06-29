@@ -25,7 +25,7 @@
 namespace Moko\Integrated;
 
 use Moko\MockDefinition,
-    Moko\InvocationExpectationFailureException;
+    Moko\Integrated\InvocationExpectationFailureException;
 
 /**
  * This class hacks PHPUnit_Framework_TestCase class and
@@ -132,7 +132,7 @@ class TestCaseAwareMockDefinition extends MockDefinition
 
     /**
      * Verifies if methods were invoked declared number of times and if not
-     * the {@class Moko\InvocationExpectationFailureException} it thrown.
+     * the {@class Moko\Integrated\InvocationExpectationFailureException} is thrown.
      *
      * @throws InvocationExpectationFailureException
      */

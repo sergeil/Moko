@@ -86,7 +86,7 @@ class PhpUnitIntegration extends \PHPUnit_Framework_TestCase
         $this->assertEquals('done', $obj->method1(null, array(), new \stdClass()));
 
         /*
-         * If you comment out this assert, \Moko\InvocationExpectationFailureException will be thrown
+         * If you comment out this assert, \Moko\Integrated\InvocationExpectationFailureException will be thrown
          */
         $this->assertEquals('done', $obj->method1(null, array(), new \stdClass()));
     }

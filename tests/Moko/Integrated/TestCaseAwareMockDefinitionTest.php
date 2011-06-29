@@ -28,7 +28,7 @@ require_once __DIR__.'/../_mocks.php';
 
 require_once __DIR__.'/../../bootstrap.php';
 
-use Moko\InvocationExpectationFailureException;
+use Moko\Integrated\InvocationExpectationFailureException;
 
 /**
  * @author Sergei Lissovski <sergei.lissovski@gmail.com>
@@ -137,7 +137,7 @@ class TestCaseAwareMockDefinitionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Moko\InvocationExpectationFailureException
+     * @expectedException Moko\Integrated\InvocationExpectationFailureException
      */
     public function testVerify_delegateMethodExpectationFailure()
     {
