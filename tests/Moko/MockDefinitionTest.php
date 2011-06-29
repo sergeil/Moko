@@ -153,7 +153,7 @@ class MockDefinitionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testCreateMock_forClasswithFinalMethods()
+    public function testCreateMock_forClassWithFinalMethods()
     {
         $ma = new MockDefinition('Moko\_MockWithFinalMethod');
         $obj = $ma->createMock();
@@ -161,17 +161,42 @@ class MockDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertType('Moko\_MockWithFinalMethod', $obj);
     }
 
-    public function testCreateMock_withShorthandAliasDefinition()
+    public function testCreateMock_withShorthandReturnValueCallbackDefinition()
     {
-        $ma = new MockDefinition('Moko\_MockWithFinalMethod');
-        $ma->addMethod('doBar', '"foo-bar"');
+        $ma1 = new MockDefinition('Moko\_MockWithFinalMethod');
+        $ma1->addMethod('doBar', "foo-bar");
 
-        $obj = $ma->createMock();
+        /* @var \Moko\_MockWithFinalMethod @obj */
+        $obj = $ma1->createMock();
         $this->assertType('Moko\_MockWithFinalMethod', $obj);
         $this->assertEquals(
             'foo-bar',
             $obj->doBar(),
-            'If second parameter of the addMethod() method is not a callback then one should be created automatically and return a passed value.'
+            'If second parameter of the addMethod() method is not a callback then it should be returned when a mocked method is invoked'
         );
+
+
+        $returnValue = new \stdClass();
+        $ma2 = new MockDefinition('Moko\_MockWithFinalMethod');
+        $ma2->addMethod('doBar', $returnValue);
+
+        $obj = $ma2->createMock();
+        $this->assertType('Moko\_MockWithFinalMethod', $obj);
+        $this->assertSame(
+            $returnValue,
+            $obj->doBar(),
+            sprintf(
+                'It was assumed that %s::doBar() would return the same instance of object that was passed as second argument to %s::addMethod() while defining its mock method.',
+                'Moko\_MockWithFinalMethod', 'Moko\MockDefinition'
+            )
+        );
+
+        
+        $ma3 = new MockDefinition('Moko\_MockWithFinalMethod');
+        $ma3->addMethod('doBar');
+
+        $obj = $ma3->createMock();
+        $this->assertType('Moko\_MockWithFinalMethod', $obj);
+        $this->assertNull($obj->doBar());
     }
 }

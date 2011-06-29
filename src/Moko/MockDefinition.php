@@ -99,13 +99,13 @@ class MockDefinition
 
     /**
      * @param  string $methodName
-     * @param \Closure|string $callbackOrReturnValue  A closure that will be invoked when an original method is invoked.
-     *                                                An instance of mock object will be passed as a first parameter of the closure,
-     *                                                if a method is static then mock's FQCN will be passed instead. Also it is possible
-     *                                                to pass a liternal or snippet of valid php code to be returned when a method is invoked.
+     * @param \Closure|string|null $callbackOrReturnValue  A closure that will be invoked when an original method is invoked.
+     *                                                     An instance of mock object will be passed as a first parameter of the closure,
+     *                                                     if a method is static then mock's FQCN will be passed instead. Also it is possible
+     *                                                     to pass a literal and it will be returned when the method is invoked.
      * @return \Moko\MockDefinition
      */
-    public function addMethod($methodName, $callbackOrReturnValue)
+    public function addMethod($methodName, $callbackOrReturnValue = null)
     {
         $this->checkMethodExistence($methodName);
 
@@ -262,8 +262,6 @@ class MockDefinition
 
         return $paramsArray;
     }
-
-    static $cz = 0;
 
     /**
      * @param array $constructorParams  Parameters that you want to pass to the constructor
