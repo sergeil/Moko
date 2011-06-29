@@ -61,7 +61,10 @@ class TestCaseAwareMockDefinitionTest extends \PHPUnit_Framework_TestCase
 
     public function testVerify_actuallyInvoked2Times()
     {
-        $ma = new TestCaseAwareMockDefinition($this, 'Moko\_MockInterface');
+        $ma = new TestCaseAwareMockDefinition(
+            $this->getMock(__CLASS__),
+            'Moko\_MockInterface'
+        );
         $ma->addMethod('doBar', function() {}, 2);
 
         $obj = $ma->createMock();
@@ -74,7 +77,10 @@ class TestCaseAwareMockDefinitionTest extends \PHPUnit_Framework_TestCase
 
     public function testVerify_twoMocksInSameTest()
     {
-        $ma = new TestCaseAwareMockDefinition($this, 'Moko\_MockInterface');
+        $ma = new TestCaseAwareMockDefinition(
+            $this->getMock(__CLASS__),
+            'Moko\_MockInterface'
+        );
         $ma->addMethod('doBar', function() {}, 2);
 
         $obj = $ma->createMock();
@@ -91,7 +97,10 @@ class TestCaseAwareMockDefinitionTest extends \PHPUnit_Framework_TestCase
 
     public function testVerify_zeroInvocationCount()
     {
-        $ma = new TestCaseAwareMockDefinition($this, 'Moko\_MockInterface');
+        $ma = new TestCaseAwareMockDefinition(
+            $this->getMock(__CLASS__),
+            'Moko\_MockInterface'
+        );
         $ma->addMethod('doBar', function() {}, 0);
 
         $ma->verify();
@@ -99,7 +108,10 @@ class TestCaseAwareMockDefinitionTest extends \PHPUnit_Framework_TestCase
 
     public function testVerify_delegateMethodWithOneInvocation()
     {
-        $ma = new TestCaseAwareMockDefinition($this, 'Moko\_MockDelegateClass');
+        $ma = new TestCaseAwareMockDefinition(
+            $this->getMock(__CLASS__),
+            'Moko\_MockDelegateClass'
+        );
         $ma->addDelegateMethod('doFoo', 1);
 
         /* @var \Moko\_MockDelegateClass $obj */
@@ -136,6 +148,20 @@ class TestCaseAwareMockDefinitionTest extends \PHPUnit_Framework_TestCase
         $ma->addDelegateMethod('doFoo', 1);
 
         $obj = $ma->createMock();
+
+        $ma->verify();
+    }
+
+    public function testVerify_withNoExpectationDefined()
+    {
+        $ma = new TestCaseAwareMockDefinition(
+            $this->getMock(__CLASS__),
+            'Moko\_MockDelegateClass'
+        );
+        $ma->addDelegateMethod('doFoo');
+
+        $obj = $ma->createMock();
+        $obj->doFoo();
 
         $ma->verify();
     }

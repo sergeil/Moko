@@ -107,6 +107,10 @@ class TestCaseAwareMockDefinition extends MockDefinition
      */
     public function addDelegateMethod($methodName, $expectedInvocationCount = null)
     {
+        if (!is_integer($expectedInvocationCount) && $expectedInvocationCount !== null) {
+            throw new \InvalidArgumentException('addDelegateMethod($methodName, $expectedInvocationCount) - $expectedInvocationCount parameter must be integer or NULL value.');
+        }
+
         $chain = parent::addDelegateMethod($methodName);
 
         $this->definitions[$methodName]['expectedInvocationsCount'] = $expectedInvocationCount;
@@ -154,7 +158,7 @@ class TestCaseAwareMockDefinition extends MockDefinition
                             $def['expectedInvocationsCount'], 0,
                             $aliasName
                         );
-                    } else if ($def['expectedInvocationsCount'] != $invocationCounters[$method]) {
+                    } else if ($def['expectedInvocationsCount'] != $invocationCounters[$method] && $def['expectedInvocationsCount'] !== null) {
                         throw new InvocationExpectationFailureException(
                             $this->targetName, $method,
                             $def['expectedInvocationsCount'], $invocationCounters[$method],
