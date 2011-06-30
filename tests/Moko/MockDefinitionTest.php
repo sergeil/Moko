@@ -199,4 +199,15 @@ class MockDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertType('Moko\_MockWithFinalMethod', $obj);
         $this->assertNull($obj->doBar());
     }
+
+    public function testCreateMock_omitConstructorAndUseDelegateOne()
+    {
+        /* @var \Moko\_AnotherMockClass $obj */
+        $md = new MockDefinition('Moko\_ConstructorAndOtherMethodInvocationFromIt', false);
+        $obj = $md->addDelegateMethod('__construct')
+        ->addMethod('doSomethingMethod', 'foo')
+        ->createMock();
+
+        $this->assertType('Moko\_ConstructorAndOtherMethodInvocationFromIt', $obj);
+    }
 }

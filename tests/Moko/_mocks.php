@@ -23,10 +23,36 @@ class _MockClass
 
 class _AnotherMockClass
 {
-    public function __construct($a, $b)
+    public $foo;
+
+    public $bar;
+
+
+    public function blah()
+    {
+        
+    }
+
+    public function __construct($foo, $bar)
+    {
+        $this->foo = $foo;
+        $this->bar = $bar;
+    }
+}
+
+class _ConstructorAndOtherMethodInvocationFromIt
+{
+    protected function doSomethingMethod()
     {
 
     }
+
+    public function __construct()
+    {
+        $this->doSomethingMethod();
+    }
+
+
 }
 
 class _MockDelegateClass

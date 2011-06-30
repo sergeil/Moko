@@ -280,8 +280,7 @@ class MockDefinition
         
         $mockClassName = $data['className'];
         $reflMockClass = new \ReflectionClass($data['namespace'].'\\'.$mockClassName);
-        
-        $obj = $this->getReflectedTarget()->hasMethod('__construct') ? $reflMockClass->newInstanceArgs($constructorParams) : $reflMockClass->newInstance();
+
 
         $callbacks = array();
         foreach ($this->definitions as $methodName=>$methodDef) {
@@ -292,6 +291,15 @@ class MockDefinition
         $reflMock = new \ReflectionClass($this->getReflectedTarget()->getNamespaceName().'\\'.$mockClassName);
         $reflMock->getProperty('____callbacks')->setValue(null, $callbacks);
         $reflMock->getProperty('____aliasName')->setValue(null, $aliasName);
+
+        /*
+         * Achtung!
+         * MockDefinitionTest::testCreateMock_omitConstructorAndUseDelegateOne:
+         * 
+         * Instance should be create only when all required static properties are injected, this
+         * is important when you have a mocked method that is invoked from delegated constructor.
+         */
+        $obj = $this->getReflectedTarget()->hasMethod('__construct') ? $reflMockClass->newInstanceArgs($constructorParams) : $reflMockClass->newInstance();
 
         return $obj;
     }
