@@ -91,7 +91,7 @@ class TestCaseAwareMockDefinition extends MockDefinition
     /**
      * {@inheritdoc}
      *
-     * @return \Moko\TestCaseAwareMockDefinition
+     * @return \Moko\Integrated\TestCaseAwareMockDefinition
      */
     public function addMethod($methodName, $callbackOrReturnValue = null, $expectedInvocationCount = null)
     {

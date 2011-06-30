@@ -27,7 +27,7 @@ class <?php echo $className ?> <?php echo $targetRelationship ?> \<?php echo $ta
 
             <?php if (!$methodDef['isExplicetelyDefined'] && !$suppressUnexpectedInteractionExceptions): ?>
                 throw new \Moko\UnexpectedInteractionException(
-                    __CLASS__, __METHOD__, self::$____aliasName
+                    '<?php echo $targetName; ?>' , __FUNCTION__, self::$____aliasName
                 );
             <?php else:?>
                 <?php $methodParams = implode(' ,', $methodDef['paramNames'])?>

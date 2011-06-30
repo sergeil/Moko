@@ -64,7 +64,7 @@ class MockFactory
 
     /**
      * @see TestCaseAwareMockDefinition::__construct()
-     * @return TestCaseAwareMockDefinition
+     * @return \Moko\Integrated\TestCaseAwareMockDefinition
      */
     public function createTestCaseAware($targetName, $omitConstructor = true)
     {
