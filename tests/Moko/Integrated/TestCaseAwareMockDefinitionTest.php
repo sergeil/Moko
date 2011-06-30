@@ -152,7 +152,7 @@ class TestCaseAwareMockDefinitionTest extends \PHPUnit_Framework_TestCase
         $ma->verify();
     }
 
-    public function testVerify_withNoExpectationDefined()
+    public function testVerify_withNoExpectationDefinedButInvoked()
     {
         $ma = new TestCaseAwareMockDefinition(
             $this->getMock(__CLASS__),
@@ -162,6 +162,19 @@ class TestCaseAwareMockDefinitionTest extends \PHPUnit_Framework_TestCase
 
         $obj = $ma->createMock();
         $obj->doFoo();
+
+        $ma->verify();
+    }
+
+    public function testVerify_withNoExpectationDefinedAndNotInvoked()
+    {
+        $ma = new TestCaseAwareMockDefinition(
+            $this->getMock(__CLASS__),
+            'Moko\_MockDelegateClass'
+        );
+        $ma->addDelegateMethod('doFoo');
+
+        $obj = $ma->createMock();
 
         $ma->verify();
     }

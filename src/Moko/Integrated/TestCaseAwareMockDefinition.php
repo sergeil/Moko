@@ -158,7 +158,9 @@ class TestCaseAwareMockDefinition extends MockDefinition
                             $def['expectedInvocationsCount'], 0,
                             $aliasName
                         );
-                    } else if ($def['expectedInvocationsCount'] != $invocationCounters[$method] && $def['expectedInvocationsCount'] !== null) {
+                    } else if (   array_key_exists($method, $invocationCounters)
+                               && $def['expectedInvocationsCount'] != $invocationCounters[$method]
+                               && $def['expectedInvocationsCount'] !== null) {
                         throw new InvocationExpectationFailureException(
                             $this->targetName, $method,
                             $def['expectedInvocationsCount'], $invocationCounters[$method],
