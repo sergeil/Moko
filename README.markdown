@@ -7,6 +7,7 @@ that differentiates Moko from other existing solutions is that you do not need t
 ### Teaser
 
 Say, you have an interface, in our case it is going to look like this one:
+
 ```
 interface UserDao
 {
@@ -15,6 +16,7 @@ interface UserDao
 ```
 
 And you need to have a mock that would return different instances of User object accordingly to the provided primary key, with Moko all you need to do is ( we pretend that this snippet is located in PHPUnit's TC method ):
+
 ```
 $testUsers = array(
     1 => new User('John Doe'),
