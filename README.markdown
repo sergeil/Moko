@@ -8,7 +8,7 @@ that differentiates Moko from other existing solutions is that you do not need t
 
 Say, you have an interface, in our case it is going to look like this one:
 
-```
+```php
 interface UserDao
 {
     public function findOneByPk($pk);
@@ -17,13 +17,13 @@ interface UserDao
 
 And you need to have a mock that would return different instances of User object accordingly to the provided primary key, with Moko all you need to do is ( we pretend that this snippet is located in PHPUnit's TC method ):
 
-```
+```php
 $testUsers = array(
     1 => new User('John Doe'),
     2 => new User('Jane Doe')
 );
 
-$moko = new \Moko\MockDefinition();
+$moko = new \Moko\MockDefinition('UserDao');
 $moko->addMethod('findOneByPk', function($service, $pk) use ($testUsers) {
     return isset($testUsers[$pk]) ? $testUsers[$pk] : null;
 });
