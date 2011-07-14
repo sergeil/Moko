@@ -2,7 +2,8 @@
 
 Moko is a lightweight mocking mini-framework that sits on top of PHP5.3+, the main problem
 Moko is intended to solve is to allow you mocking classes in an efficient way. The main thing
-that differentiates Moko from other existing solutions is that you do not need to learn another DSL, because Moko uses, as someone may say, "dirty" mocking approach which leverages closures(callbacks). Moko also has integration also provide some integration with PHPUnit.
+that differentiates Moko from other existing solutions is that you do not need to learn another DSL, because Moko uses, as someone may say, "dirty" mocking approach which leverages closures(callbacks).
+Moko also provides some integration with PHPUnit.
 
 ### Teaser
 
@@ -34,5 +35,5 @@ $this->assertSame($serviceMock->findOneByPk(1), $testUsers[1]);
 $this->assertSame($serviceMock->findOneByPk(2), $testUsers[2]);
 ```
 
-Moko provides intuitive integration mechanism with PHPUnit, for more examples and more elaborate examples please 
+Moko provides an intuitive integration mechanism with PHPUnit, for more examples and more elaborate examples please
 use wiki - https://github.com/sergeil/Moko/wiki.
