@@ -22,50 +22,16 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-namespace Moko\Integrated;
+namespace Moko;
 
 /**
- * This exception should be thrown when expectations about how many times
- * a method should have been invoked do not met.
+ * Variable names that are shared in mock template and mock generators.
  *
  * @author Sergei Lissovski <sergei.lissovski@gmail.com>
  */ 
-class InvocationExpectationFailureException extends \RuntimeException
+class SharedValues 
 {
-    protected $expected;
-
-    protected $actual;
-    
-    protected $aliasName;
-
-    public function __construct($class, $method, $expected, $actual, $aliasName = null)
-    {
-        $this->expected = $expected;
-        $this->actual = $actual;
-        $this->aliasName = $aliasName;
-
-        $this->message = sprintf(
-            'Method %s::%s was expected to be invoked %s times but instead was %s times.',
-            $class, $method, $expected, $actual
-        );
-
-        if (null !== $aliasName) {
-            $this->message .= "( mock-alias: '$aliasName')";
-        }
-    }
-
-    public function getActual()
-    {
-        return $this->actual;
-    }
-
-    public function getExpected()
-    {
-        return $this->expected;
-    }
-
-    public function getAliasName()
-    {
-        return $this->aliasName;
-    }
+    const CALLBACKS = '____callbacks';
+    const INVOCATION_COUNTERS = '____invocationCounters';
+    const ALIAS_NAME = '____aliasName';
 }

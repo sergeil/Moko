@@ -1,13 +1,15 @@
-
+<?php
+use \Moko\SharedValues as SV;
+?>
 
 namespace <?php echo $namespace ?>;
 
 <?php echo $targetDocBlock ?>
 class <?php echo $className ?> <?php echo $targetRelationship ?> \<?php echo $targetName; ?> 
 {
-    static public $____callbacks = array();
-    static public $____invocationCounters = array();
-    static public $____aliasName = null;
+    static public $<?php echo SV::CALLBACKS ?> = array();
+    static public $<?php echo SV::INVOCATION_COUNTERS ?> = array();
+    static public$<?php echo SV::ALIAS_NAME ?> = null;
 
     <?php if ($omitConstructor): ?> 
     public function __construct()
@@ -20,10 +22,10 @@ class <?php echo $className ?> <?php echo $targetRelationship ?> \<?php echo $ta
         <?php echo $methodDef['docBlock'] ?>
         <?php echo implode(' ', $methodDef['modifiers']) ?> function <?php echo $methodName ?>(<?php echo implode(',', $methodDef['params'])?>)
         {
-            if (!isset(self::$____invocationCounters['<?php echo $methodName ?>'])) {
-                self::$____invocationCounters['<?php echo $methodName ?>'] = 0;
+            if (!isset(self::$<?php echo SV::INVOCATION_COUNTERS ?>['<?php echo $methodName ?>'])) {
+                self::$<?php echo SV::INVOCATION_COUNTERS ?>['<?php echo $methodName ?>'] = 0;
             }
-            self::$____invocationCounters['<?php echo $methodName ?>']++;
+            self::$<?php echo SV::INVOCATION_COUNTERS ?>['<?php echo $methodName ?>']++;
 
             <?php if (!$methodDef['isExplicetelyDefined'] && !$suppressUnexpectedInteractionExceptions): ?>
                 throw new \Moko\UnexpectedInteractionException(

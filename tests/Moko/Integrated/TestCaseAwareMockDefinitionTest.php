@@ -43,7 +43,7 @@ class TestCaseAwareMockDefinitionTest extends \PHPUnit_Framework_TestCase
         );
         $chain = $ma->addMethod('doBar', function() {}, 2);
 
-        $this->assertSame($chain, $ma, "Method chaining doesn't as it expected to.");
+        $this->assertSame($chain, $ma, "Method chaining doesn't work as we expected it to.");
 
         $mock = $ma->createMock(array(), 'Charlie');
 

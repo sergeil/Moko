@@ -25,7 +25,8 @@
 namespace Moko\Integrated;
 
 use Moko\MockDefinition,
-    Moko\Integrated\InvocationExpectationFailureException;
+    Moko\Integrated\InvocationExpectationFailureException,
+    \Moko\SharedValues as SV;
 
 /**
  * This class hacks PHPUnit_Framework_TestCase class and
@@ -51,11 +52,36 @@ class TestCaseAwareMockDefinition extends MockDefinition
     protected $dispensedMocks = array();
 
     /**
+     * @var \ExpectedInvocationCountEvaluatorImpl\Integrated\ExpectedInvocationCountEvaluator
+     */
+    protected  $expectedInvocationCountEvaluator;
+
+    /**
      * @return \PHPUnit_Framework_TestCase 
      */
     public function getTestCase()
     {
         return $this->testCase;
+    }
+
+    /**
+     * @param \ExpectedInvocationCountEvaluatorImpl\Integrated\ExpectedInvocationCountEvaluator $expectedInvocationCountEvaluator
+     */
+    public function setExpectedInvocationCountEvaluator($expectedInvocationCountEvaluator)
+    {
+        $this->expectedInvocationCountEvaluator = $expectedInvocationCountEvaluator;
+    }
+
+    /**
+     * @return \ExpectedInvocationCountEvaluatorImpl\Integrated\ExpectedInvocationCountEvaluator
+     */
+    public function getExpectedInvocationCountEvaluator()
+    {
+        if (null === $this->expectedInvocationCountEvaluator) {
+            $this->expectedInvocationCountEvaluator = new ExpectedInvocationCountEvaluatorImpl();
+        }
+
+        return $this->expectedInvocationCountEvaluator;
     }
 
     /**
@@ -107,14 +133,9 @@ class TestCaseAwareMockDefinition extends MockDefinition
      */
     public function addDelegateMethod($methodName, $expectedInvocationCount = null)
     {
-        if (!is_integer($expectedInvocationCount) && $expectedInvocationCount !== null) {
-            throw new \InvalidArgumentException('addDelegateMethod($methodName, $expectedInvocationCount) - $expectedInvocationCount parameter must be integer or NULL value.');
-        }
-
         $chain = parent::addDelegateMethod($methodName);
 
         $this->definitions[$methodName]['expectedInvocationsCount'] = $expectedInvocationCount;
-        $this->definitions[$methodName]['mockAlias'] = ''; // TODO get rid of it
 
         return $chain;
     }
@@ -126,8 +147,25 @@ class TestCaseAwareMockDefinition extends MockDefinition
     {
         $mock = parent::createMock($constructorParams, $aliasName, $suppressUnexpectedInteractionExceptions);
         $this->dispensedMocks[] = $mock;
+
+        $this->initInvocationCounters($mock);
         
         return $mock;
+    }
+
+    /**
+     * Will initialize the invocation counters for all methods to 0.
+     */
+    private function initInvocationCounters($mock)
+    {
+        $invocationCounters = array();
+
+        $reflClass = new \ReflectionClass($mock);
+        foreach ($reflClass->getMethods() as $reflMethod) {
+            $invocationCounters[$reflMethod->getName()] = 0;
+        }
+
+        $reflClass->getProperty(SV::INVOCATION_COUNTERS)->setValue(null, $invocationCounters);
     }
 
     /**
@@ -141,36 +179,31 @@ class TestCaseAwareMockDefinition extends MockDefinition
         foreach ($this->dispensedMocks as $mock) {
             $reflMock = new \ReflectionClass($mock);
 
-            $invocationCounters = $reflMock->getProperty('____invocationCounters')->getValue(null);
-            foreach (get_class_methods($mock) as $method) {
-                if (isset($this->definitions[$method])) {
-                    $def = $this->definitions[$method];
+            $invocationCounters = $reflMock->getProperty(SV::INVOCATION_COUNTERS)->getValue(null);
+            foreach (get_class_methods($mock) as $methodName) {
+                if (isset($this->definitions[$methodName])) {
+                    $def = $this->definitions[$methodName];
 
-                    if ($def['expectedInvocationsCount'] === 0) {
+                    // if expectation is NULL treating it we just didn't want to specify any
+                    if ($def['expectedInvocationsCount'] === null) {
                         continue;
                     }
 
-                    $aliasName = $reflMock->getProperty('____aliasName')->getValue(null);
-
-                    if ($def['expectedInvocationsCount'] !== null && !isset($invocationCounters[$method])) {
-                        throw new InvocationExpectationFailureException(
-                            $this->targetName, $method,
-                            $def['expectedInvocationsCount'], 0,
-                            $aliasName
-                        );
-                    } else if (   array_key_exists($method, $invocationCounters)
-                               && $def['expectedInvocationsCount'] != $invocationCounters[$method]
-                               && $def['expectedInvocationsCount'] !== null) {
-                        throw new InvocationExpectationFailureException(
-                            $this->targetName, $method,
-                            $def['expectedInvocationsCount'], $invocationCounters[$method],
-                            $aliasName
-                        );
-                    }
+                    $aliasName = $reflMock->getProperty(SV::ALIAS_NAME)->getValue(null);
+                    $this->getExpectedInvocationCountEvaluator()->evaluate(
+                        $this->targetName,
+                        $mock,
+                        $methodName,
+                        $aliasName,
+                        $invocationCounters,
+                        $def['expectedInvocationsCount']
+                    );
                 }
             }
         }
     }
+
+
 
     // mimicking the phpUnit's MockObject's interface
 
@@ -187,7 +220,7 @@ class TestCaseAwareMockDefinition extends MockDefinition
     {
         foreach ($this->dispensedMocks as $mock) {
             $reflMock = new \ReflectionClass($mock);
-            $reflMock->getProperty('____invocationCounters')->setValue(null, array());
+            $reflMock->getProperty(SV::INVOCATION_COUNTERS)->setValue(null, array());
         }
     }
 }

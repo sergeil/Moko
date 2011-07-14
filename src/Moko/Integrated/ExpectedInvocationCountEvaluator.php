@@ -25,47 +25,21 @@
 namespace Moko\Integrated;
 
 /**
- * This exception should be thrown when expectations about how many times
- * a method should have been invoked do not met.
+ * You may implement this interface and inject it to {@class TestCaseAwareMockDefinition} if
+ * you need more fancy logic for evaluating expectations count validity.
  *
  * @author Sergei Lissovski <sergei.lissovski@gmail.com>
  */ 
-class InvocationExpectationFailureException extends \RuntimeException
+interface ExpectedInvocationCountEvaluator
 {
-    protected $expected;
-
-    protected $actual;
-    
-    protected $aliasName;
-
-    public function __construct($class, $method, $expected, $actual, $aliasName = null)
-    {
-        $this->expected = $expected;
-        $this->actual = $actual;
-        $this->aliasName = $aliasName;
-
-        $this->message = sprintf(
-            'Method %s::%s was expected to be invoked %s times but instead was %s times.',
-            $class, $method, $expected, $actual
-        );
-
-        if (null !== $aliasName) {
-            $this->message .= "( mock-alias: '$aliasName')";
-        }
-    }
-
-    public function getActual()
-    {
-        return $this->actual;
-    }
-
-    public function getExpected()
-    {
-        return $this->expected;
-    }
-
-    public function getAliasName()
-    {
-        return $this->aliasName;
-    }
+    /**
+     * @throws InvocationExpectationFailureException  If expectations are not satisfied
+     * @param string $targetName  Name of original interface/class a mock is created for
+     * @param mixed $mock  The mock object itself
+     * @param string $methodName  Method name we are evaluating expectations at the moment for
+     * @param string $aliasName  Alias name that was assigned to this mock object
+     * @param array $invocationCounters  All expectations that were tracked for this mock object
+     * @param integer $expectedInvocationsCount  An instruction that must be satisfied not to have an exception thrown
+     */
+    public function evaluate($targetName, $mock, $methodName, $aliasName, array $invocationCounters, $expectedInvocationsCount);
 }

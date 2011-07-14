@@ -25,47 +25,25 @@
 namespace Moko\Integrated;
 
 /**
- * This exception should be thrown when expectations about how many times
- * a method should have been invoked do not met.
- *
  * @author Sergei Lissovski <sergei.lissovski@gmail.com>
  */ 
-class InvocationExpectationFailureException extends \RuntimeException
+class ExpectedInvocationCountEvaluatorImpl implements ExpectedInvocationCountEvaluator
 {
-    protected $expected;
-
-    protected $actual;
-    
-    protected $aliasName;
-
-    public function __construct($class, $method, $expected, $actual, $aliasName = null)
+    /**
+     * {@inheritdoc}
+     */
+    public function evaluate($targetName, $mock, $methodName, $aliasName, array $invocationCounters, $expectedInvocationsCount)
     {
-        $this->expected = $expected;
-        $this->actual = $actual;
-        $this->aliasName = $aliasName;
-
-        $this->message = sprintf(
-            'Method %s::%s was expected to be invoked %s times but instead was %s times.',
-            $class, $method, $expected, $actual
-        );
-
-        if (null !== $aliasName) {
-            $this->message .= "( mock-alias: '$aliasName')";
+        if (!is_integer($expectedInvocationsCount) && $expectedInvocationsCount !== null) {
+            throw new \InvalidArgumentException('expectedInvocationCount must be either INTEGER or NULL.');
         }
-    }
 
-    public function getActual()
-    {
-        return $this->actual;
-    }
-
-    public function getExpected()
-    {
-        return $this->expected;
-    }
-
-    public function getAliasName()
-    {
-        return $this->aliasName;
+        if ($expectedInvocationsCount != $invocationCounters[$methodName]) {
+            throw new InvocationExpectationFailureException(
+                $targetName, $methodName,
+                $expectedInvocationsCount, $invocationCounters[$methodName],
+                $aliasName
+            );
+        }
     }
 }
