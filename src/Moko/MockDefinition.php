@@ -275,6 +275,7 @@ class MockDefinition
     {
         $data = $this->createTemplateData($constructorParams, $suppressUnexpectedInteractionExceptions);
 
+
         $compiledSource = $this->compileTemplate($data);
         eval($compiledSource);
         

@@ -9,7 +9,7 @@ class <?php echo $className ?> <?php echo $targetRelationship ?> \<?php echo $ta
 {
     static public $<?php echo SV::CALLBACKS ?> = array();
     static public $<?php echo SV::INVOCATION_COUNTERS ?> = array();
-    static public$<?php echo SV::ALIAS_NAME ?> = null;
+    static public $<?php echo SV::ALIAS_NAME ?> = null;
 
     <?php if ($omitConstructor): ?> 
     public function __construct()
@@ -26,7 +26,7 @@ class <?php echo $className ?> <?php echo $targetRelationship ?> \<?php echo $ta
                 self::$<?php echo SV::INVOCATION_COUNTERS ?>['<?php echo $methodName ?>'] = 0;
             }
             self::$<?php echo SV::INVOCATION_COUNTERS ?>['<?php echo $methodName ?>']++;
-
+            
             <?php if (!$methodDef['isExplicetelyDefined'] && !$suppressUnexpectedInteractionExceptions): ?>
                 throw new \Moko\UnexpectedInteractionException(
                     '<?php echo $targetName; ?>' , __FUNCTION__, self::$____aliasName
