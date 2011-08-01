@@ -194,7 +194,8 @@ class MockDefinition
             'targetRelationship' => null,
             'targetDocBlock' => '',
             'targetName' => $this->getTargetName(),
-            'nonMockedMethodNames' => array()
+            'nonMockedMethodNames' => array(),
+            'isInterface' => null
         );
 
         $reflTarget = $this->getReflectedTarget();
@@ -213,6 +214,7 @@ class MockDefinition
         $data['namespace'] = $reflTarget->getNamespaceName();
         $data['targetRelationship'] = $reflTarget->isInterface() ?  'implements' : 'extends';
         $data['targetDocBlock'] = $reflTarget->getDocComment();
+        $data['isInterface'] = $reflTarget->isInterface();
 
         return $data;
     }

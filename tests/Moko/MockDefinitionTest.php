@@ -223,4 +223,13 @@ class MockDefinitionTest extends \PHPUnit_Framework_TestCase
             'If unexpected-interaction-exceptions are suppressed, methods still should return execution result.'
         );
     }
+
+    public function testCreateMock_suppressUnexpectedInteractionExceptions_interface()
+    {
+        $md = new MockDefinition('Moko\_MockInterface');
+
+        /* @var \Moko\_MockWithReturningMethod $obj */
+        $obj = $md->createMock(array(), null, true);
+        $obj->doFoo('foobar');
+    }
 }

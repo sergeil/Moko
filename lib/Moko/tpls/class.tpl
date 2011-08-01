@@ -52,7 +52,7 @@ class <?php echo $className ?> <?php echo $targetRelationship ?> \<?php echo $ta
                         <?php else: ?>
                             return $callback;
                         <?php endif; ?>
-                    <?php else: ?>
+                    <?php elseif (!$isInterface): ?>
                     return parent::<?php echo $methodName ?>(
                         <?php
                         if (sizeof($methodDef['paramNames'])) {
