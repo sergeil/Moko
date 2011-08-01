@@ -53,7 +53,13 @@ class <?php echo $className ?> <?php echo $targetRelationship ?> \<?php echo $ta
                             return $callback;
                         <?php endif; ?>
                     <?php else: ?>
-                    // exception ?
+                    return parent::<?php echo $methodName ?>(
+                        <?php
+                        if (sizeof($methodDef['paramNames'])) {
+                            echo $methodParams;
+                        }
+                        ?>
+                    );
                     <?php endif; ?>
                 <?php endif ?>
             <?php endif ?>

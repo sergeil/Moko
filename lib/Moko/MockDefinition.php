@@ -155,6 +155,16 @@ class MockDefinition
     }
 
     /**
+     * @param array $methodNames
+     */
+    public function addDelegateMethods(array $methodNames)
+    {
+        foreach ($methodNames as $methodName) {
+            $this->addDelegateMethod($methodName);
+        }
+    }
+
+    /**
      * @throws \InvalidArgumentException  If the provided method is not declared in target's class/interface
      * @param  $methodName
      * @return void

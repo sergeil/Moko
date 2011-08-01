@@ -82,3 +82,11 @@ class _MockWithFinalMethod
         
     }
 }
+
+class _MockWithReturningMethod
+{
+    public function getSomething($bar)
+    {
+        return 'something-'.$bar;
+    }
+}
