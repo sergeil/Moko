@@ -211,25 +211,12 @@ class MockDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertType('Moko\_ConstructorAndOtherMethodInvocationFromIt', $obj);
     }
 
-    public function testCreateMock_suppressUnexpectedInteractionExceptions()
+    public function testCreateMock_suppressUnexpectedInteractionExceptions_returnValue()
     {
         $md = new MockDefinition('Moko\_MockWithReturningMethod');
 
         /* @var \Moko\_MockWithReturningMethod $obj */
         $obj = $md->createMock(array(), null, true);
-        $this->assertEquals(
-            'something-hello',
-            $obj->getSomething('hello'),
-            'If unexpected-interaction-exceptions are suppressed, methods still should return execution result.'
-        );
-    }
-
-    public function testCreateMock_suppressUnexpectedInteractionExceptions_interface()
-    {
-        $md = new MockDefinition('Moko\_MockInterface');
-
-        /* @var \Moko\_MockWithReturningMethod $obj */
-        $obj = $md->createMock(array(), null, true);
-        $obj->doFoo('foobar');
+        $this->assertNull($obj->getSomething('foobar'));
     }
 }

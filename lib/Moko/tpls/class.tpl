@@ -34,7 +34,7 @@ class <?php echo $className ?> <?php echo $targetRelationship ?> \<?php echo $ta
             <?php else:?>
                 <?php $methodParams = implode(' ,', $methodDef['paramNames'])?>
 
-                <?php if ($methodDef['isDelegate'] === true): ?>
+                <?php if ($methodDef['isDelegate'] === true && !$isInterface): ?>
                     return parent::<?php echo $methodName ?>(<?php echo $methodParams ?>);
                 <?php else: ?>
                     <?php if ($methodDef['callback'] !== null): ?>
@@ -52,14 +52,7 @@ class <?php echo $className ?> <?php echo $targetRelationship ?> \<?php echo $ta
                         <?php else: ?>
                             return $callback;
                         <?php endif; ?>
-                    <?php elseif (!$isInterface): ?>
-                    return parent::<?php echo $methodName ?>(
-                        <?php
-                        if (sizeof($methodDef['paramNames'])) {
-                            echo $methodParams;
-                        }
-                        ?>
-                    );
+                    <?php else: ?>
                     <?php endif; ?>
                 <?php endif ?>
             <?php endif ?>
