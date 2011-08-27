@@ -70,4 +70,9 @@ class MockFactory
     {
         return new \Moko\Integrated\TestCaseAwareMockDefinition($this->testCase, $targetName, $omitConstructor);
     }
+
+    static public function clazz()
+    {
+        return get_called_class();
+    }
 }

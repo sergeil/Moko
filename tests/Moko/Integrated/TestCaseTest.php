@@ -24,39 +24,23 @@
 
 namespace Moko\Integrated;
 
+require_once __DIR__.'/../../bootstrap.php';
+ 
 /**
- * Extend this class and Moko will be initialized so you don't need to bootstrap it manually.
- * In case you're going to override {#setUp}, {#tearDown} methods - don't forget to invoke parent
- * methods!
- *
  * @author Sergei Lissovski <sergei.lissovski@gmail.com>
- */
-class TestCase extends \PHPUnit_Framework_TestCase
+ */ 
+class TestCaseTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \Moko\MockFactory
-     */
-    protected $mf;
-
-    /**
-     * @return \Moko\MockFactory
-     */
-    public function getMockFactory()
+    public function testSetUpAndTearDown()
     {
-        return $this->mf;
-    }
+        $tc = new TestCase();
 
-    public function setUp()
-    {
-        parent::setUp();
+        $this->assertNull($tc->getMockFactory());
 
-        $this->mf = new \Moko\MockFactory($this);
-    }
+        $tc->setUp();
+        $this->assertType(\Moko\MockFactory::clazz(), $tc->getMockFactory());
 
-    public function tearDown()
-    {
-        $this->mf = null;
-
-        parent::tearDown();
+        $tc->tearDown();
+        $this->assertNull($tc->getMockFactory());
     }
 }
