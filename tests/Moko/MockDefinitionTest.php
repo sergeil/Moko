@@ -219,4 +219,12 @@ class MockDefinitionTest extends \PHPUnit_Framework_TestCase
         $obj = $md->createMock(array(), null, true);
         $this->assertNull($obj->getSomething('foobar'));
     }
+
+    public function testCreateMock_withMethodReturnByReference()
+    {
+        $md = new MockDefinition('Moko\_MockWithReturningMethod');
+
+        /* @var \Moko\_MockWithReturningMethod $obj */
+        $obj = $md->createMock(array(), null, true);
+    }
 }

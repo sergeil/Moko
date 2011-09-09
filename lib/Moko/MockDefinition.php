@@ -244,7 +244,8 @@ class MockDefinition
             'params' => $this->createMethodParams($reflMethod),
             'paramNames' => $paramNames,
             'isStatic' => $reflMethod->isStatic(),
-            'callback' => isset($this->definitions[$methodName]) && isset($this->definitions[$methodName]['callback']) ? $this->definitions[$methodName]['callback'] : null
+            'callback' => isset($this->definitions[$methodName]) && isset($this->definitions[$methodName]['callback']) ? $this->definitions[$methodName]['callback'] : null,
+            'byReference' => $reflMethod->returnsReference() ? '&' : ''
         );
     }
 

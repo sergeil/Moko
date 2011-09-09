@@ -83,10 +83,21 @@ class _MockWithFinalMethod
     }
 }
 
-class _MockWithReturningMethod
+interface ByReferenceInterface
 {
+    public function &somethingByReference();
+}
+
+class _MockWithReturningMethod implements ByReferenceInterface
+{
+    public $something = array('foo');
+
     public function getSomething($bar)
     {
         return 'something-'.$bar;
+    }
+
+    public function &somethingByReference()
+    {
     }
 }
