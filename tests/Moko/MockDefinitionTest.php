@@ -268,4 +268,28 @@ class MockDefinitionTest extends \PHPUnit_Framework_TestCase
         /* @var \Moko\_MockWithReturningMethod $obj */
         $obj = $md->createMock(array(), null, true);
     }
+
+    public function testCallbackNamedParams()
+    {
+        $this->markTestIncomplete('Planned, but not implemented yet');
+
+        $cx = $this;
+        $t = new \stdClass();
+        $t->i = 1;
+
+        $md = new MockDefinition('Moko\_MockInterface');
+        $md->addMethod('doFoo', function($self, $tc, $in, $param)  use($cx, $t) {
+            $cx->assertSame($cx, $tc);
+            $cx->assertEquals($t->i, $in);
+            $t->i++;
+            return 'result!';
+        });
+
+        /* @var \Moko\_MockInterface $obj */
+        $obj = $md->createMock();
+        $this->assertEquals('result!', $obj->doFoo('param-value'));
+
+        // extra invocation count validation
+        $this->doFoo('x');
+    }
 }

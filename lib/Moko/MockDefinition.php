@@ -351,7 +351,7 @@ class MockDefinition
      */
     public function am($methodName, $callbackOrReturnValue = null)
     {
-        return $this->addMethod($methodName, $callbackOrReturnValue);
+        return call_user_func_array(array($this, 'addMethod'), func_get_args());
     }
 
     /**
@@ -359,7 +359,7 @@ class MockDefinition
      */
     public function adm($methodName)
     {
-        return $this->addDelegateMethod($methodName);
+        return call_user_func_array(array($this, 'addDelegateMethod'), func_get_args());
     }
 
     /**
@@ -367,6 +367,6 @@ class MockDefinition
      */
     public function adms(array $methodNames)
     {
-        return $this->addDelegateMethods($methodNames);
+        return call_user_func_array(array($this, 'addDelegateMethods'), func_get_args());
     }
 }
