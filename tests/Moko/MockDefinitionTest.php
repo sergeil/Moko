@@ -219,7 +219,7 @@ class MockDefinitionTest extends \PHPUnit_Framework_TestCase
         $obj = $md->createMock(array(), null, true);
         $this->assertNull($obj->getSomething('foobar'));
     }
-
+    
     public function testAlias_am()
     {
         /* @var \Moko\MockDefinition $md */
@@ -259,5 +259,13 @@ class MockDefinitionTest extends \PHPUnit_Framework_TestCase
               ->will($this->returnValue('return-value'));
 
         $this->assertEquals('return-value', $md->adms($methods));
+    }
+
+    public function testCreateMock_withMethodReturnByReference()
+    {
+        $md = new MockDefinition('Moko\_MockWithReturningMethod');
+
+        /* @var \Moko\_MockWithReturningMethod $obj */
+        $obj = $md->createMock(array(), null, true);
     }
 }

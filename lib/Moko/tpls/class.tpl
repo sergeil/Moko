@@ -20,7 +20,7 @@ class <?php echo $className ?> <?php echo $targetRelationship ?> \<?php echo $ta
     <?php foreach($methods as $methodName=>$methodDef): ?>
     
         <?php echo $methodDef['docBlock'] ?>
-        <?php echo implode(' ', $methodDef['modifiers']) ?> function <?php echo $methodName ?>(<?php echo implode(',', $methodDef['params'])?>)
+        <?php echo implode(' ', $methodDef['modifiers']) ?> function <?php echo $methodDef['byReference'] ?> <?php echo $methodName ?>(<?php echo implode(',', $methodDef['params'])?>)
         {
             if (!isset(self::$<?php echo SV::INVOCATION_COUNTERS ?>['<?php echo $methodName ?>'])) {
                 self::$<?php echo SV::INVOCATION_COUNTERS ?>['<?php echo $methodName ?>'] = 0;
