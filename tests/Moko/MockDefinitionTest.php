@@ -219,4 +219,45 @@ class MockDefinitionTest extends \PHPUnit_Framework_TestCase
         $obj = $md->createMock(array(), null, true);
         $this->assertNull($obj->getSomething('foobar'));
     }
+
+    public function testAlias_am()
+    {
+        /* @var \Moko\MockDefinition $md */
+        $md = $this->getMock(MockDefinition::clazz(), array('addMethod'), array('stdClass'));
+
+        $md->expects($this->once())
+              ->method('addMethod')
+              ->with($this->stringContains('fooMethod'), $this->stringContains('barCallback'))
+              ->will($this->returnValue('return-value'));
+
+        $this->assertEquals('return-value', $md->am('fooMethod', 'barCallback'));
+    }
+
+    public function testAlias_adm()
+    {
+        /* @var \Moko\MockDefinition $md */
+        $md = $this->getMock(MockDefinition::clazz(), array('addDelegateMethod'), array('stdClass'));
+
+        $md->expects($this->once())
+              ->method('addDelegateMethod')
+              ->with($this->stringContains('fooMethod'))
+              ->will($this->returnValue('return-value'));
+
+        $this->assertEquals('return-value', $md->adm('fooMethod'));
+    }
+
+    public function testAlias_adms()
+    {
+        /* @var \Moko\MockDefinition $md */
+        $md = $this->getMock(MockDefinition::clazz(), array('addDelegateMethods'), array('stdClass'));
+
+        $methods = array('foo', 'bar');
+
+        $md->expects($this->once())
+              ->method('addDelegateMethods')
+              ->with($this->identicalTo($methods))
+              ->will($this->returnValue('return-value'));
+
+        $this->assertEquals('return-value', $md->adms($methods));
+    }
 }

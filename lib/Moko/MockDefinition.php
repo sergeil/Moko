@@ -29,26 +29,15 @@ namespace Moko;
  */ 
 class MockDefinition
 {
-    /**
-     * @var string
-     */
+    /* @var string */
     protected $targetName;
-    
-    /**
-     * @var array
-     */
+    /* @var array */
     protected $definitions = array();
-
-    /**
-     * @var boolean
-     */
+    /* @var boolean */
     protected $isConstructorOmitted;
-
-    /**
-     * @var \ReflectionClass
-     */
+    /* @var \ReflectionClass */
     protected $reflTarget;
-
+    
     /**
      * @return \ReflectionClass
      */
@@ -251,7 +240,6 @@ class MockDefinition
     private function createMethodParams(\ReflectionMethod $reflMethod)
     {
         $paramsArray = array();
-
         foreach ($reflMethod->getParameters() as $methodParam) {
             $signature = '';
 
@@ -271,7 +259,6 @@ class MockDefinition
 
             $paramsArray[] = $signature;
         }
-
         return $paramsArray;
     }
 
@@ -286,7 +273,6 @@ class MockDefinition
     public function createMock(array $constructorParams = array(), $aliasName = null, $suppressUnexpectedInteractionExceptions = false)
     {
         $data = $this->createTemplateData($constructorParams, $suppressUnexpectedInteractionExceptions);
-
 
         $compiledSource = $this->compileTemplate($data);
         eval($compiledSource);
@@ -347,5 +333,39 @@ class MockDefinition
         $cn .= '_'.spl_object_hash($this);
 
         return $cn; 
+    }
+
+    /**
+     * @return string
+     */
+    static public function clazz()
+    {
+        return get_called_class();
+    }
+
+    // aliases:
+
+    /**
+     * Alias for {#addMethod())
+     */
+    public function am($methodName, $callbackOrReturnValue = null)
+    {
+        return $this->addMethod($methodName, $callbackOrReturnValue);
+    }
+
+    /**
+     * Alias for (#addDelegateMethod)
+     */
+    public function adm($methodName)
+    {
+        return $this->addDelegateMethod($methodName);
+    }
+
+    /**
+     * Alias for (#addDelegateMethods)
+     */
+    public function adms(array $methodNames)
+    {
+        return $this->addDelegateMethods($methodNames);
     }
 }
