@@ -101,7 +101,11 @@ class TestCaseAwareMockDefinition extends MockDefinition
     protected function hackTestCase()
     {
         $reflTc = new \ReflectionClass($this->testCase);
-        if (!$reflTc->hasProperty('mockObjects')) {
+        while($reflTc && !$reflTc->hasProperty('mockObjects')) {
+            $reflTc = $reflTc->getParentClass();
+        }
+
+        if (!$reflTc) {
             throw new \InvalidArgumentException(
                 "Provided instance of TestCase seems to be outdated and doesn't have support for native mocking."
             );
@@ -202,10 +206,12 @@ class TestCaseAwareMockDefinition extends MockDefinition
             }
         }
     }
-
-
-
+    
     // mimicking the phpUnit's MockObject's interface
+    public function __phpunit_hasMatchers()
+    {
+        return false;
+    }
 
     public function __phpunit_verify()
     {
